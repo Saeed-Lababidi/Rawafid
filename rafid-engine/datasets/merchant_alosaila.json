@@ -1,0 +1,45 @@
+{
+  "merchant": {
+    "id": "m_10482",
+    "name": "مطعم الأصالة",
+    "sector": "restaurants",
+    "tenure_months": 14,
+    "registration_verified": true
+  },
+  "revenue": {
+    "monthly_avg": 218000,
+    "weekly_series": [50200, 49800, 52100, 51600, 53000, 50900, 52400, 51100, 49900, 52700, 51800, 53200],
+    "currency": "SAR"
+  },
+  "sales": {
+    "by_platform": { "jahez": 0.52, "foodics": 0.31, "salla": 0.17 },
+    "orders_90d": 9640,
+    "refund_rate": 0.018
+  },
+  "banking": {
+    "avg_balance": 96000,
+    "net_inflow_ratio": 0.34,
+    "negative_balance_days": 1,
+    "returned_payments": 0
+  },
+  "settlements": {
+    "confirmed_receivables": 84500,
+    "upcoming": [
+      { "date": "2026-07-08", "expected": 39200 },
+      { "date": "2026-07-15", "expected": 41800 },
+      { "date": "2026-07-22", "expected": 37500 }
+    ],
+    "chargeback_rate": 0.004,
+    "dispute_rate": 0.006
+  },
+  "repayment": {
+    "prior_advances": 2,
+    "on_time_ratio": 0.78
+  },
+  "meta": {
+    "data_completeness": 0.92,
+    "sources_connected": ["bank", "jahez", "foodics", "salla"],
+    "as_of": "2026-07-03"
+  },
+  "extra_signals": {}
+}
