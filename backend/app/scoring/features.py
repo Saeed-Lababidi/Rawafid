@@ -1,5 +1,6 @@
 """Feature engineering: aggregated rows -> ScoringFeatures (backend-owned)."""
 
+import math
 import statistics
 from datetime import date, timedelta
 
@@ -7,8 +8,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.domain.models import Merchant, SalesOrderRow, SettlementRow, TransactionRow
-from app.scoring.base import ScoringFeatures
+from app.domain.models import (
+    Connection,
+    Merchant,
+    SalesOrderRow,
+    SettlementRow,
+    TransactionRow,
+)
+from app.scoring.base import ScoringFeatures, UpcomingSettlement
+
+_SECTORS = {"restaurants", "ecommerce"}
 
 
 async def build_features(session: AsyncSession, merchant: Merchant) -> ScoringFeatures:
@@ -91,6 +100,73 @@ async def build_features(session: AsyncSession, merchant: Merchant) -> ScoringFe
         else {}
     )
 
+    # --- richer signals for the rafid-engine (additive; stub/http ignore them) ---
+    # weekly revenue series from the daily window
+    weekly = [round(sum(series[i : i + 7]), 2) for i in range(0, len(series), 7)]
+
+    # Expected forward settlement stream repayment is deducted from. We project the
+    # merchant's ESTABLISHED cadence forward rather than passing the 1-2 raw pending
+    # rows, which are a lumpy snapshot at the payout-window boundary (one full cycle
+    # + one partial) and misrepresent settlement regularity. Amount = typical
+    # historical payout; spacing = observed avg settlement cadence. The advance is
+    # still capped by real confirmed_receivables (held), so this only shapes the
+    # repayment schedule and the settlement-reliability signal, never the exposure.
+    typical_settlement = (
+        round(statistics.mean([c.amount for c in credits]), 2)
+        if credits
+        else (round(held_total / len(held), 2) if held else 0.0)
+    )
+    cadence_days = max(7, round(avg_settlement_days))
+    upcoming_settlements: list[UpcomingSettlement] = []
+    if typical_settlement > 0 and held_total > 0:
+        n_cycles = min(12, max(4, math.ceil(held_total / typical_settlement) + 2))
+        for i in range(1, n_cycles + 1):
+            upcoming_settlements.append(
+                UpcomingSettlement(
+                    date=(today + timedelta(days=cadence_days * i)).isoformat(),
+                    expected=typical_settlement,
+                )
+            )
+
+    # bank-statement net inflow over the window (credits vs debits)
+    txns = (
+        (
+            await session.execute(
+                select(TransactionRow).where(
+                    TransactionRow.merchant_id == merchant.id,
+                    TransactionRow.date >= since,
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    inflow = sum(t.amount for t in txns if t.direction == "credit")
+    outflow = sum(t.amount for t in txns if t.direction == "debit")
+    net_inflow_ratio = round((inflow - outflow) / inflow, 4) if inflow > 0 else 0.0
+
+    # connected data sources -> drives the engine's confidence/data-completeness
+    conns = (
+        (
+            await session.execute(
+                select(Connection).where(
+                    Connection.merchant_id == merchant.id,
+                    Connection.status == "active",
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    sources = sorted({c.type for c in conns})
+    has_bank = "bank" in sources
+    has_sales = "sales" in sources
+    data_completeness = round(
+        0.5 * (total_revenue > 0) + 0.25 * has_bank + 0.25 * has_sales, 3
+    )
+
+    sector = merchant.business_type if merchant.business_type in _SECTORS else "other"
+
     return ScoringFeatures(
         merchant_id=merchant.id,
         window_days=window_days,
@@ -104,4 +180,14 @@ async def build_features(session: AsyncSession, merchant: Merchant) -> ScoringFe
         chargeback_ratio=round(refunded_amount / total_amount, 4) if total_amount else 0.0,
         account_age_days=(today - merchant.established_at).days,
         platform_mix=mix,
+        merchant_name=merchant.name,
+        sector=sector,
+        registration_verified=merchant.verification_status == "verified",
+        weekly_revenue=weekly,
+        upcoming_settlements=upcoming_settlements,
+        # backend has no separate dispute signal; refunds already feed chargeback_ratio
+        dispute_rate=0.0,
+        net_inflow_ratio=net_inflow_ratio,
+        sources_connected=sources,
+        data_completeness=data_completeness,
     )

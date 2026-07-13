@@ -12,7 +12,8 @@ def get_scoring_model() -> CreditScoringModel:
     if backend == "http":
         return HttpScoringModel()
     if backend == "module":
-        # Saeed's in-process model: drop his module in and import it here.
-        # from app.scoring.saeed import SaeedModel; return SaeedModel()
-        raise NotImplementedError("module backend awaits Saeed's model; use stub")
+        # Saeed's in-process rafid-engine behind the frozen seam.
+        from app.scoring.saeed import SaeedModel
+
+        return SaeedModel()
     return StubScoringModel()
