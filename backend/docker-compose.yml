@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: rafid-db
+    environment:
+      POSTGRES_USER: rafid
+      POSTGRES_PASSWORD: rafid
+      POSTGRES_DB: rafid
+    ports:
+      - "5433:5432"
+    volumes:
+      - rafid_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rafid"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    container_name: rafid-api
+    profiles: ["full"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://rafid:rafid@db:5432/rafid
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  rafid_pgdata:
