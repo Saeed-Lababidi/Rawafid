@@ -464,19 +464,21 @@ Note: if Vercel preview deployments (unique URL per PR/push) also need to reach 
 
 **If this table is empty:** N/A — see rows above.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does Vercel's existing project need "Include files outside the Root Directory" enabled?**
+> All three questions were resolved during planning: Q1 → 01-04 Task 1 ("Include files outside Root Directory" stays OFF), Q2 → Railway provisioned first, Render+UptimeRobot documented-only (01-01, `<assumption_delta_decision>` add-alongside), Q3 → 01-01 Task 3 executes the console-path-then-token-fallback verification.
+
+1. **RESOLVED — Does Vercel's existing project need "Include files outside the Root Directory" enabled?**
    - What we know: Frontend (`frontend/`) has no shared workspace dependency on `backend/` or `rafid-engine/` — it's a fully standalone Next.js app.
    - What's unclear: Whether any planned Phase-2 OpenAPI-codegen step needs to read files outside `frontend/` (e.g., fetching `openapi.json` is a network call to the *deployed* backend, not a local file read, so likely no).
    - Recommendation: Leave "Include files outside Root Directory" **off** for Phase 1; revisit only if a later phase needs local cross-directory file access during the Vercel build.
 
-2. **Railway vs Render final choice — provision both or just Railway first?**
+2. **RESOLVED — Railway vs Render final choice — provision both or just Railway first?**
    - What we know: Railway's no-default-sleep behavior is objectively lower cold-start risk than Render's 15-minute spin-down; CONTEXT.md already locks Railway as primary.
    - What's unclear: Whether Railway's free/trial resource ceiling (1GB RAM, shared vCPU) is sufficient for FastAPI + APScheduler + a modest Postgres-adjacent workload under demo load (a handful of judges hitting the API simultaneously) — no load-testing data available.
    - Recommendation: Provision Railway first (today, 2026-07-15) to maximize the 30-day trial window's overlap with judging; keep the Render+UptimeRobot Dockerfile/config path documented (Pattern 5 covers both) but don't necessarily provision it unless Railway shows resource strain during rehearsal.
 
-3. **Remote demo-reset (DEPLOY-03): host console vs guarded endpoint — which is actually available on Railway's free/trial tier?**
+3. **RESOLVED — Remote demo-reset (DEPLOY-03): host console vs guarded endpoint — which is actually available on Railway's free/trial tier?**
    - What we know: Railway offers a web-based shell / `railway run <command>` CLI path in general; whether `railway run make reset` is invocable against a *deployed* (not local) service on the trial plan specifically wasn't directly confirmed via docs fetch in this session.
    - What's unclear: Some hosts restrict shell/exec access to paid tiers only — this needs a direct check against Railway's current dashboard during the deploy plan (01-02), not assumed from general product documentation.
    - Recommendation: Plan 01-02 should verify Railway's exec/shell availability on the actual provisioned trial project as an early step; if unavailable, fall back to the minimal token-guarded reset endpoint (smallest possible backend delta, per CONTEXT.md's explicit fallback guidance) — e.g. `POST /admin/reset?token=<env-secret>` calling the existing `app.seed.run --reset` logic in-process.
