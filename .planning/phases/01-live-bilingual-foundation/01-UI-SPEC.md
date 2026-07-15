@@ -161,16 +161,26 @@ Phase 1 has no auth, no data lists, no destructive actions (all arrive Phase 2/3
 
 ## UI Considerations
 
-Applicable state considerations resolved: 4 covered, 2 backstop, 0 unresolved.
+Probe run 2026-07-15 (`ui-consideration-probe.cjs`, 5 elements, 20 applicable candidates). Resolved under full-autonomous delegation: **11 covered, 1 backstop, 8 dismissed (reasons recorded), 0 unresolved**. E3 (health badge) returned `unclassified` from the heuristic — manually classified as an async status indicator per the --auto kind-confirmation rule; its loading/error/populated categories are resolved below.
 
-| Category | Element(s) | Status | Resolution / Reason |
-|----------|------------|--------|---------------------|
-| loading | health badge | ✅ covered | First render shows the neutral "جارٍ التحقق / Checking…" state until the initial `/health` fetch resolves — see Copywriting Contract row above. |
-| error | health badge | ✅ covered | Fetch failure or non-2xx renders the destructive "غير متصل / Offline" state with retry tooltip — see Copywriting Contract row above. |
-| populated | health badge | ✅ covered | Successful `/health` 200 renders the locked "متصل / Live" state (green dot) — D-06. |
-| long-text | header (logo + language pill + theme toggle), hero headline | ✅ covered | Header is a flex row that wraps to two lines below ~360px rather than truncating or overlapping; Arabic string lengths differ from English by design, so no fixed-width containers are used in the header. Hero headline wraps naturally (no `truncate`/ellipsis) at any viewport ≥390px. |
-| overflow | header at 390px viewport | 🧪 backstop | Visual regression check: at exactly 390px, logo wordmark + language pill + theme toggle must not overlap or clip. No automated layout test exists for this yet — treat as a manual/visual verification item at implementation, not a silent pass. |
-| zero-one-many | n/a | ⚠ unresolved | No collections render in Phase 1 (first appears Phase 3). Planner should not attempt to cover this category for Phase 1 tasks. |
+| Element | Category | Status | Resolution / Reason |
+|---------|----------|--------|---------------------|
+| E3 health badge | loading | ✅ covered | First render shows neutral "جارٍ التحقق / Checking…" until the initial `/health` fetch resolves — Copywriting Contract row. |
+| E3 health badge | error | ✅ covered | Fetch failure or non-2xx renders destructive "غير متصل / Offline" (risk-d red dot) with retry tooltip — Copywriting Contract row. |
+| E3 health badge | populated | ✅ covered | `/health` 200 renders locked "متصل / Live" state (green dot) — D-06. |
+| E1 header chrome | populated | ✅ covered | Normal state: logo wordmark + language pill + theme toggle all visible and tappable (44px targets) at every viewport ≥390px, both locales, both themes. |
+| E1 header chrome | long-text | ✅ covered | Flex row wraps to two lines below ~360px; no fixed-width containers; AR/EN label length difference absorbed by wrap, never truncation. |
+| E1 header chrome | overflow | 🧪 backstop | { statement: "At exactly 390px, logo wordmark + language pill + theme toggle do not overlap or clip, in ar-RTL and en-LTR, light and dark", verification: backstop } — manual/visual check at implementation; no automated layout test yet; never a silent pass. |
+| E2 hero | long-text | ✅ covered | Headline and subheadline wrap naturally (no `truncate`/ellipsis) at every viewport ≥390px. |
+| E2 hero | overflow | ✅ covered | Hero is single-column stacked flow; content wraps and the page scrolls vertically; no fixed-height containers. |
+| E4 disclaimer banner | long-text | ✅ covered | Copy strings are fixed and locked (Copywriting Contract); banner wraps to multiple lines on narrow viewports; banner height flexes. |
+| E4 disclaimer banner | overflow | ✅ covered | Full-width block element; wraps, never clips; non-dismissible so no interaction states. |
+| E5 how-it-works strip | populated | ✅ covered | 3-up `auto-fit minmax(320px,1fr)` grid on desktop, stacks to 1 column at 390px. |
+| E5 how-it-works strip | overflow | ✅ covered | Auto-fit grid wraps items; no fixed heights; long Arabic copy wraps inside each item. |
+| E1 header chrome | empty / loading / error / partial / zero-one-many | ✖ dismissed | Header renders fixed static controls — no data content, no fetch. Locale/theme resolve server-side before paint (D-11, FOUND-02), so no loading/error/empty state can exist. Not a collection. |
+| E5 how-it-works strip | empty / loading / error / partial / zero-one-many | ✖ dismissed | Static hardcoded marketing content — no data source, no fetch, fixed 3 items (not a data collection). |
+
+**Note for planner:** collections (lists/feeds) first render in Phase 3 — zero-one-many, empty-state, and pagination categories re-enter scope there; do not attempt them in Phase 1 tasks.
 
 ---
 
@@ -185,11 +195,11 @@ Applicable state considerations resolved: 4 covered, 2 backstop, 0 unresolved.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: FLAG (non-blocking — 18px handoff exceptions documented and unrendered in Phase 1; keep exception list closed)
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** APPROVED — gsd-ui-checker, revision 1, 2026-07-15. Checker recommendation: any new off-4pt spacing value requires the same source+approval+non-render documentation before Phase 3 or it becomes a BLOCK when it first renders.
