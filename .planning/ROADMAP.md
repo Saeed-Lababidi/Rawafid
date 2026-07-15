@@ -31,11 +31,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User sees handoff §1 tokens (incl. risk-band-D and alert-severity scales), IBM Plex Sans Arabic with no FOUT/layout shift, and bidi-safe numbers/currency/dates via one central utility, on a correct layout from 390px through desktop
   4. User sees the demo-dataset disclaimer visible in the UI
   5. The deployed frontend reaches the free-hosted backend + Postgres with no cold-start risk (health check passes, CORS allows only the Vercel origin, API URL is env-driven), and demo data can be reset remotely
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Scaffold Next.js App Router + Tailwind v4 tokens, next-intl [locale] RTL/LTR routing, next-themes flash-free dark mode, IBM Plex Sans Arabic via next/font, central bidi-safe number/currency/date utility, responsive base, demo disclaimer
-- [ ] 01-02: Provision backend + Neon Postgres on free host (Railway primary, Render+UptimeRobot fallback), deploy scaffold to existing Vercel project pointed at it (env API URL + CORS allow-list), verify keep-alive and remote demo-reset path against July 17
+- [ ] 01-01-PLAN.md — Deploy backend + Neon Postgres to Railway (repo-root Dockerfile, CORS allow-list, asyncpg TLS, fresh secrets, remote demo-reset) — DEPLOY-01/02/03
+- [ ] 01-02-PLAN.md — Scaffold Next.js + Tailwind v4, next-intl [locale] RTL/LTR routing (ar default, cookie-persisted), central bidi-safe format utility, env-driven API URL — FOUND-01, FOUND-05
+- [ ] 01-03-PLAN.md — @theme token system (handoff §1 + dark + risk-D + severity chips), IBM Plex Sans Arabic, flash-free cookie-resolved theming, header/footer chrome, health badge, disclaimer, landing page 390px→desktop — FOUND-02/03/04/06/07
+- [ ] 01-04-PLAN.md — Vercel cutover (Root Directory frontend/, NEXT_PUBLIC_API_URL), live E2E verification (routing, CORS pair, badge Live, no-flash, 390px visual) — DEPLOY-02, FOUND-02/06 live checks
 
 **UI hint**: yes
 
@@ -121,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Live Bilingual Foundation | 0/2 | Not started | - |
+| 1. Live Bilingual Foundation | 0/4 | Not started | - |
 | 2. Authenticated Typed API Layer | 0/2 | Not started | - |
 | 3. Merchant Core Loop | 0/3 | Not started | - |
 | 4. Admin Surface & Demo Choreography | 0/2 | Not started | - |
