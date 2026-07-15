@@ -89,17 +89,52 @@ Deferred. Tracked but not in the current roadmap.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Which phases cover which requirements. Populated during roadmap creation (2026-07-15).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmap) | | |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Pending |
+| FOUND-06 | Phase 1 | Pending |
+| FOUND-07 | Phase 1 | Pending |
+| DEPLOY-01 | Phase 1 | Pending |
+| DEPLOY-02 | Phase 1 | Pending |
+| DEPLOY-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 2 | Pending |
+| AUTH-02 | Phase 2 | Pending |
+| AUTH-03 | Phase 2 | Pending |
+| AUTH-04 | Phase 2 | Pending |
+| AUTH-05 | Phase 2 | Pending |
+| MERCH-01 | Phase 3 | Pending |
+| MERCH-02 | Phase 3 | Pending |
+| MERCH-03 | Phase 3 | Pending |
+| MERCH-04 | Phase 3 | Pending |
+| MERCH-05 | Phase 3 | Pending |
+| MERCH-06 | Phase 3 | Pending |
+| MERCH-07 | Phase 3 | Pending |
+| MERCH-08 | Phase 3 | Pending |
+| MERCH-09 | Phase 3 | Pending |
+| MERCH-10 | Phase 3 | Pending |
+| MERCH-11 | Phase 3 | Pending |
+| ADMIN-01 | Phase 4 | Pending |
+| ADMIN-02 | Phase 4 | Pending |
+| ADMIN-03 | Phase 4 | Pending |
+| ADMIN-04 | Phase 4 | Pending |
+| DEMO-01 | Phase 4 | Pending |
+| WOW-01 | Phase 5 | Pending |
+| WOW-02 | Phase 5 | Pending |
+| WOW-03 | Phase 5 | Pending |
+| WOW-04 | Phase 5 | Pending |
+| WOW-05 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30 ⚠️ (pre-roadmap)
+- v1 requirements: 36 total (recount — prior "30" was an undercount of the listed items)
+- Mapped to phases: 36
+- Unmapped: 0 ✓ (100% coverage, no orphans, no duplicates)
 
 ---
 *Requirements defined: 2026-07-15*
-*Last updated: 2026-07-15 after initial definition*
+*Last updated: 2026-07-15 after roadmap traceability populated*
