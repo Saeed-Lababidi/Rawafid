@@ -22,11 +22,17 @@ created: 2026-07-15
 | Preset | not applicable |
 | Component library | none — plain semantic HTML + Tailwind v4 utilities for Phase 1 (header/footer/landing only; no dialogs, forms, or tables yet). Toggle buttons are native `<button>` elements. |
 | Icon library | `lucide-react` (tree-shakable, wide adoption, works standalone without a component-library dependency; RTL note below) |
-| Font | IBM Plex Sans Arabic — `next/font/google`, `subsets: ['arabic', 'latin']`, `weight: ['400', '700']` preloaded (500 loaded on-demand for chip/pill emphasis text only, per Typography section) |
+| Font | IBM Plex Sans Arabic — `next/font/google`, `subsets: ['arabic', 'latin']`, `weight: ['400', '700']` preloaded — the only two weights rendered in Phase 1 (see Typography). Weight 500 exists as a **reserved** CSS custom property only (handoff scale), not loaded/rendered this phase. |
 
 **shadcn decision (auto-resolved, full-autonomous mode):** Not initialized in Phase 1. Rationale: (1) RESEARCH.md's Standard Stack — the authoritative technical findings for this phase — specifies next-intl + next-themes + Tailwind v4 `@theme` with a fully bespoke, exact-hex semantic token system (handoff §1); it does not include shadcn. (2) shadcn init requires an external interactive step (visit ui.shadcn.com/create, paste a preset string back) that cannot complete in a single autonomous pass. (3) Phase 1's visible surface (header, footer, hero, two toggle buttons, one status badge) has no interactive-pattern complexity (no dialogs/forms/tables/comboboxes) that would justify the dependency yet. **Revisit in Phase 3** (offer review forms, connect wizard, data tables) or Phase 4 (admin tables) where shadcn's primitives (Radix-based Dialog, Select, Table) earn their cost — at that point `npx shadcn init` can adopt the existing `@theme` CSS custom properties rather than replacing them.
 
 **Icon RTL note:** Lucide icons are not auto-mirrored. Directional icons (arrows, chevrons) must get `rtl:-scale-x-100` (or equivalent) applied per-instance where direction is semantically "forward/back" — Phase 1 usage is limited to non-directional icons (`Sun`, `Moon`, `Globe`/`Languages`, `CircleCheck`/`CircleAlert` for the health badge), so no mirroring is needed yet. Flag this pattern for Phase 3+ when back/forward wizard-step icons appear.
+
+---
+
+## Visual Hierarchy
+
+Landing screen has one focal anchor: the hero Arabic headline (28px H1, weight 700, `--navy`/`--cream` max-contrast text) — largest element on the page, drawn first by the eye. The primary CTA ("كيف يعمل رافد؟" / "How Rafid works") is secondary — visually subordinate to the headline via smaller type (14px) but carrying the sole accent-color fill on the page so it still reads as clickable. The health badge and the demo-dataset disclaimer are peripheral: both live in the header/footer at 12px meta scale, muted-text color, low visual weight — present for trust/compliance signaling, not competing for primary attention.
 
 ---
 
@@ -44,10 +50,20 @@ Declared values (8-point scale):
 | 2xl | 48px | Major section breaks (hero → features) |
 | 3xl | 64px | Page-level top/bottom spacing (desktop only; 32px on mobile) |
 
-**Exceptions (locked by handoff §1 — design-system source of truth, not arbitrary):**
-- Card grid gap: **18px** (not on the 8-pt scale — handoff-specified, applies once shell has card grids in later phases; not exercised on the Phase 1 landing page itself but the token must exist now per "scaffold once, never retrofit").
-- Radii: card **18px**, tile **12px**, pill **999px** (fully rounded — used for the language toggle and theme toggle).
-- Touch targets: icon-only header buttons (language pill, theme toggle) get a minimum **44×44px** hit area even though the visible pill/icon is smaller — WCAG 2.5.5, critical on the 390px mobile-first target (QR-code traffic per handoff §1).
+### Approved Exceptions (off 8-pt scale)
+
+All other spacing in this phase stays strictly on the 4/8-pt scale above — no OTHER off-scale value may be introduced without going through this same approval path.
+
+| Value | What | Source | Approval |
+|-------|------|--------|----------|
+| 18px | Card grid gap | `RAFID_FRONTEND_HANDOFF.md` §1 — brand geometry, locked design-system value, not arbitrary | User full-autonomous delegation, locked in discuss-phase via CONTEXT.md D-09 ("handoff §1 is source of truth, never retrofit"), 2026-07-15 |
+| 18px | Card corner radius | `RAFID_FRONTEND_HANDOFF.md` §1 — same rationale as grid gap above | User full-autonomous delegation, CONTEXT.md D-09, 2026-07-15 |
+
+Neither value is exercised on the Phase 1 landing page itself (no card grids render yet) — both tokens are scaffolded now per "scaffold once, never retrofit" and will first render in Phase 3.
+
+**Other non-8pt values (not exceptions — different category):**
+- Radii: tile **12px** (also handoff §1, non-grid decorative radius — not a spacing value, informational only), pill **999px** (fully rounded — used for the language toggle and theme toggle).
+- Touch targets: icon-only header buttons (language pill, theme toggle) get a minimum **44×44px** hit area even though the visible pill/icon is smaller — WCAG 2.5.5, critical on the 390px mobile-first target (QR-code traffic per handoff §1). 44px is a touch-target minimum, not a spacing/gap token, and is itself a multiple of 4.
 
 **Responsive grid (FOUND-06, handoff §1):** `grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))`, mobile-first — collapses to 1 column below ~360px automatically. Landing page sections stack vertically on mobile (390px) with `md:` breakpoint (768px) introducing multi-column layout where content warrants it (e.g., a 3-up "how it works" strip).
 
@@ -55,17 +71,27 @@ Declared values (8-point scale):
 
 ## Typography
 
-Source of truth: handoff §1 type scale (locked). 5 declared sizes — exceeds the generic 3-4 guidance deliberately because this phase's job is to scaffold the *complete* token system (never retrofitted per project decision), even though the landing page itself only exercises 3 of the 5 rows.
+Source of truth: handoff §1 type scale (locked). Contract is split into an **Active Type Set** (capped at 4 sizes / 2 weights, per design-contract rules) and a separately-labeled **Reserved Tokens** table for handoff-scale values Phase 1 doesn't render.
 
-| Role | Size | Weight | Line Height | Used on Phase-1 landing? |
-|------|------|--------|-------------|---------------------------|
-| Meta / Label | 12px | 400 (500 for chip text) | 1.4 | Yes — disclaimer banner, health-badge label |
+### Phase 1 Active Type Set (4 sizes / 2 weights — hard cap, enforced)
+
+| Role | Size | Weight | Line Height | Rendered on Phase-1 landing? |
+|------|------|--------|-------------|-------------------------------|
+| Meta / Label | 12px | 400 | 1.4 | Yes — disclaimer banner, health-badge label |
 | Body | 14px | 400 | 1.5 | Yes — hero subheadline, section copy |
-| Card heading | 17px | 700 | 1.3 | No — reserved token, first used Phase 3 dashboard cards |
 | Page heading (H1) | 28px | 700 | 1.2 | Yes — hero headline, also the header logotype/wordmark scale reference |
-| Display / big number | 40px | 700 | 1.15 | No — reserved token for score gauge & financial figures, first used Phase 3 |
+| Display / big number | 40px | 700 | 1.15 | Not yet rendered — token scaffolded now (score gauge & financial figures land Phase 3); counted in the active set per handoff §1's fixed 4-row scale |
 
-**Declared weights:** 400 (regular — body/meta) and 700 (bold — headings), per the 2-weight contract guideline. Exception: 500 (medium) is loaded on-demand and permitted **only** for chip/pill label text (health-badge text, language-toggle active state) where the handoff's chip anatomy calls for slightly heavier-than-body weight without full bold.
+**Declared weights (2, hard cap):** 400 (regular — body/meta) and 700 (bold — headings/display). No other weight renders anywhere on the Phase 1 surface, including chip/pill labels (health-badge text and the language-toggle active state both render at 400/700 from the table above, not 500).
+
+### Reserved Tokens (handoff §1 — defined in CSS, first rendered Phase 3+)
+
+These exist as CSS custom properties/`@theme` values only. They render nowhere in Phase 1 and do **not** count against the active 4-size/2-weight set above — scaffolded once now so the token system is never retrofitted later, per CONTEXT.md D-09 and the user's full-autonomous delegation.
+
+| Token | Size / Weight | Line Height | Usage | First Rendered |
+|-------|----------------|-------------|-------|-----------------|
+| Card heading | 17px / 700 | 1.3 | Dashboard/connection card titles | Phase 3 |
+| Chip/pill emphasis weight | 500 (medium) | n/a (weight token only) | Reserved for future chip/pill label emphasis beyond the active 400/700 pair, per handoff §1 chip anatomy | Phase 3+ (not exercised by Phase 1's health-badge/language-toggle chips, which use 400/700 per the Active Type Set above) |
 
 **Numbers, currency & dates (bidi-safe, FOUND-05):** All figures render through the single utility `frontend/src/lib/format.ts` (see RESEARCH.md Pattern 4 — canonical implementation, not restated here). Contract for this phase's visible surface:
 - Western digits in both locales (`-u-nu-latn`), `tabular-nums` applied via Tailwind's `tabular-nums` utility class on every formatted value.
