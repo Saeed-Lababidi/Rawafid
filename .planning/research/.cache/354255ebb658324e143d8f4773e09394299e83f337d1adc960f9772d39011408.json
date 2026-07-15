@@ -1,0 +1,1 @@
+{"content":"TanStack Query v5 refetchInterval (ms or fn of Query->number|false) polls independent of staleTime; refetchIntervalInBackground for background tabs; standard mechanism for websocket-less live-data polling.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-07-15T13:26:20.746Z","ttl":86400000,"kind":"web"}

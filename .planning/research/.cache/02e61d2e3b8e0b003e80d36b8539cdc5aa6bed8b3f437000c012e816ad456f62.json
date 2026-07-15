@@ -1,0 +1,1 @@
+{"content":"Supabase free tier: 500MB DB storage, 2 active projects, but projects auto-pause after 7 days of DB inactivity requiring manual dashboard restore (~60s) - risk if left untouched, workable if kept warm by APScheduler's own periodic writes.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-07-15T13:26:23.011Z","ttl":86400000,"kind":"web"}
