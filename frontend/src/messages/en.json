@@ -8,12 +8,14 @@
     "languageToggleAria": "Switch to Arabic",
     "themeToggleToDark": "Switch to dark mode",
     "themeToggleToLight": "Switch to light mode",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "signIn": "Sign in"
   },
   "hero": {
     "headline": "Smart financing for your business, built on your data",
     "subheadline": "Connect your bank and sales platforms and receive Sharia-compliant Murabaha funding against your confirmed receivables — with a transparent, explainable credit assessment.",
-    "cta": "How Rafid works"
+    "cta": "How Rafid works",
+    "ctaPrimary": "Get started"
   },
   "howItWorks": {
     "title": "How Rafid works",
@@ -38,5 +40,109 @@
   },
   "disclaimer": {
     "text": "Demo dataset for presentation purposes only — not real bank accounts."
+  },
+  "app": {
+    "logout": "Sign out",
+    "dashboard": "Dashboard",
+    "financing": "Financing",
+    "portfolio": "Portfolio"
+  },
+  "login": {
+    "title": "Sign in to Rafid",
+    "subtitle": "Access your financing dashboard.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "genericError": "Something went wrong. Try again.",
+    "demoLabel": "Or jump straight into a demo account",
+    "demo": {
+      "merchantHealthy": { "name": "Healthy merchant", "desc": "TechSouq — strong receivables, happy path" },
+      "merchantRisky": { "name": "At-risk merchant", "desc": "Amber Cosmetics — revenue drop & delays" },
+      "admin": { "name": "Bank underwriter", "desc": "Portfolio & risk dashboard" }
+    }
+  },
+  "dashboard": {
+    "greeting": "Welcome back",
+    "heldReceivables": "Confirmed receivables held by platforms",
+    "heldHint": "Cash you can unlock today — financing is a percentage of this amount.",
+    "getFinancing": "Get financing",
+    "activeOutstanding": "Outstanding balance",
+    "activeContract": "Active Murabaha contract",
+    "noContract": "No active contract",
+    "latestScore": "Latest credit score",
+    "band": "Risk band {band}",
+    "notScored": "Not yet assessed",
+    "pendingSettlements": "Pending settlements",
+    "acrossPlatforms": "Across your platforms",
+    "revenueTitle": "Daily revenue — last 90 days",
+    "revenueHint": "Completed orders across all connected sales platforms.",
+    "upcomingSettlements": "Upcoming settlements",
+    "delayed": "Delayed",
+    "noSettlements": "No pending settlements.",
+    "alertsTitle": "Alerts",
+    "noAlerts": "No alerts — all clear.",
+    "severity": { "low": "Low", "medium": "Medium", "high": "High" }
+  },
+  "financing": {
+    "title": "Financing",
+    "error": "Something went wrong. Try again.",
+    "introTitle": "Unlock cash against your receivables",
+    "introBody": "Run a transparent credit assessment on your 90 days of connected data. It takes a second, and you'll see exactly what drives the decision.",
+    "runAssessment": "Run credit assessment",
+    "yourScore": "Your credit score",
+    "approvedUpTo": "Approved for up to {amount}",
+    "declined": "Not approved at this time.",
+    "whyTitle": "Why this score",
+    "contributionsTitle": "What moved your score",
+    "generateOffer": "See my offer",
+    "offerCash": "Cash advance today",
+    "advanceRatio": "{pct}% of your confirmed receivables",
+    "costBreakdown": "Cost breakdown",
+    "murabahaNote": "Sharia-compliant Murabaha — the bank buys at cost and sells at cost plus a disclosed profit. No interest.",
+    "offer": {
+      "principal": "Cash advance (cost price)",
+      "profitAmount": "Disclosed profit",
+      "platformFee": "Platform fee",
+      "successFee": "Success fee",
+      "totalRepayable": "Total repayable"
+    },
+    "underwriterNote": "Underwriter note",
+    "expires": "Offer valid until {date}",
+    "acceptOffer": "Accept & receive cash",
+    "rejectOffer": "Not now",
+    "outstanding": "Outstanding balance",
+    "statusActive": "Active",
+    "statusRepaid": "Fully repaid",
+    "repaidOf": "of {total} total",
+    "costPrice": "Advanced (cost price)",
+    "profit": "Disclosed profit",
+    "totalDue": "Total due",
+    "scheduleTitle": "Repayment schedule",
+    "schedule": { "paid": "Paid", "partial": "Partial", "pending": "Pending" }
+  },
+  "admin": {
+    "title": "Portfolio",
+    "subtitle": "Bank underwriter dashboard",
+    "simDate": "Simulated date: {date}",
+    "advanceDay": "Advance one day",
+    "activeContracts": "Active contracts",
+    "disbursed": "Total disbursed",
+    "outstanding": "Total outstanding",
+    "expectedRevenue": "Expected revenue",
+    "funnelTitle": "Origination funnel",
+    "funnel": {
+      "registered": "Registered",
+      "connected": "Connected",
+      "scored": "Scored",
+      "offered": "Offered",
+      "accepted": "Accepted"
+    },
+    "riskTitle": "Risk distribution",
+    "bandLabel": "Band {band}",
+    "alertsTitle": "Risk alerts",
+    "openAlerts": "{count} open",
+    "noAlerts": "No open alerts.",
+    "merchantsTitle": "Merchants",
+    "verified": "Verified"
   }
 }

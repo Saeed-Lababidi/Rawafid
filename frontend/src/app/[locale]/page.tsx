@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 export default function LandingPage() {
   const tHero = useTranslations('hero');
@@ -17,12 +18,20 @@ export default function LandingPage() {
           {tHero('headline')}
         </h1>
         <p className="max-w-2xl text-body text-body-text-muted">{tHero('subheadline')}</p>
-        <a
-          href="#how-it-works"
-          className="inline-flex h-11 items-center justify-center rounded-pill bg-accent px-6 text-body font-bold text-accent-foreground transition-opacity hover:opacity-90"
-        >
-          {tHero('cta')}
-        </a>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/login"
+            className="inline-flex h-11 items-center justify-center rounded-pill bg-accent px-6 text-body font-bold text-accent-foreground transition-opacity hover:opacity-90"
+          >
+            {tHero('ctaPrimary')}
+          </Link>
+          <a
+            href="#how-it-works"
+            className="inline-flex h-11 items-center justify-center rounded-pill border border-hairline-strong px-6 text-body font-bold text-body-text transition-colors hover:border-accent hover:text-accent"
+          >
+            {tHero('cta')}
+          </a>
+        </div>
       </section>
 
       <section id="how-it-works" className="flex scroll-mt-24 flex-col gap-6">

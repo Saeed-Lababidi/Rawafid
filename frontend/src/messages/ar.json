@@ -8,12 +8,14 @@
     "languageToggleAria": "التبديل إلى اللغة الإنجليزية",
     "themeToggleToDark": "تفعيل الوضع الداكن",
     "themeToggleToLight": "تفعيل الوضع الفاتح",
-    "skipToContent": "تخطَّ إلى المحتوى"
+    "skipToContent": "تخطَّ إلى المحتوى",
+    "signIn": "تسجيل الدخول"
   },
   "hero": {
     "headline": "تمويل ذكي لمنشأتك، مبني على بياناتك",
     "subheadline": "اربط حساباتك المصرفية ومنصات مبيعاتك، واحصل على تمويل مرابحة متوافق مع الشريعة مقابل مستحقاتك المؤكدة — بتقييم ائتماني شفّاف وقابل للتفسير.",
-    "cta": "كيف يعمل رافد؟"
+    "cta": "كيف يعمل رافد؟",
+    "ctaPrimary": "ابدأ الآن"
   },
   "howItWorks": {
     "title": "كيف يعمل رافد",
@@ -38,5 +40,109 @@
   },
   "disclaimer": {
     "text": "بيانات تجريبية لأغراض العرض التوضيحي فقط — لا تمثل حسابات مصرفية حقيقية."
+  },
+  "app": {
+    "logout": "تسجيل الخروج",
+    "dashboard": "لوحة التحكم",
+    "financing": "التمويل",
+    "portfolio": "المحفظة"
+  },
+  "login": {
+    "title": "تسجيل الدخول إلى رافد",
+    "subtitle": "ادخل إلى لوحة التمويل الخاصة بك.",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "genericError": "حدث خطأ ما. حاول مرة أخرى.",
+    "demoLabel": "أو ادخل مباشرة إلى حساب تجريبي",
+    "demo": {
+      "merchantHealthy": { "name": "تاجر بحالة جيدة", "desc": "تِك سوق — مستحقات قوية، المسار الناجح" },
+      "merchantRisky": { "name": "تاجر متعثّر", "desc": "أمبر للتجميل — انخفاض إيرادات وتأخّر تسويات" },
+      "admin": { "name": "مُقيّم ائتماني بنكي", "desc": "لوحة المحفظة والمخاطر" }
+    }
+  },
+  "dashboard": {
+    "greeting": "مرحباً بعودتك",
+    "heldReceivables": "المستحقات المؤكدة المحتجزة لدى المنصات",
+    "heldHint": "سيولة يمكنك الحصول عليها اليوم — التمويل نسبة من هذا المبلغ.",
+    "getFinancing": "احصل على تمويل",
+    "activeOutstanding": "الرصيد المتبقي",
+    "activeContract": "عقد مرابحة نشط",
+    "noContract": "لا يوجد عقد نشط",
+    "latestScore": "أحدث تقييم ائتماني",
+    "band": "فئة المخاطر {band}",
+    "notScored": "لم يُقيَّم بعد",
+    "pendingSettlements": "التسويات المعلّقة",
+    "acrossPlatforms": "عبر منصاتك",
+    "revenueTitle": "الإيراد اليومي — آخر ٩٠ يوماً",
+    "revenueHint": "الطلبات المكتملة عبر جميع منصات المبيعات المرتبطة.",
+    "upcomingSettlements": "التسويات القادمة",
+    "delayed": "متأخرة",
+    "noSettlements": "لا توجد تسويات معلّقة.",
+    "alertsTitle": "التنبيهات",
+    "noAlerts": "لا توجد تنبيهات — كل شيء على ما يرام.",
+    "severity": { "low": "منخفضة", "medium": "متوسطة", "high": "عالية" }
+  },
+  "financing": {
+    "title": "التمويل",
+    "error": "حدث خطأ ما. حاول مرة أخرى.",
+    "introTitle": "احصل على سيولة مقابل مستحقاتك",
+    "introBody": "شغّل تقييماً ائتمانياً شفّافاً على بيانات ٩٠ يوماً المرتبطة. يستغرق ثانية، وسترى بوضوح ما يقف خلف القرار.",
+    "runAssessment": "شغّل التقييم الائتماني",
+    "yourScore": "تقييمك الائتماني",
+    "approvedUpTo": "موافقة حتى {amount}",
+    "declined": "غير موافق عليه حالياً.",
+    "whyTitle": "لماذا هذا التقييم",
+    "contributionsTitle": "ما الذي أثّر في تقييمك",
+    "generateOffer": "اعرض عرضي",
+    "offerCash": "سيولة نقدية اليوم",
+    "advanceRatio": "{pct}٪ من مستحقاتك المؤكدة",
+    "costBreakdown": "تفصيل التكلفة",
+    "murabahaNote": "مرابحة متوافقة مع الشريعة — يشتري البنك بالتكلفة ويبيع بالتكلفة زائد ربح مُفصَح عنه. بلا فوائد.",
+    "offer": {
+      "principal": "السيولة النقدية (سعر التكلفة)",
+      "profitAmount": "الربح المُفصَح عنه",
+      "platformFee": "رسوم المنصة",
+      "successFee": "رسوم النجاح",
+      "totalRepayable": "إجمالي المبلغ المستحق"
+    },
+    "underwriterNote": "ملاحظة المُقيّم",
+    "expires": "العرض ساري حتى {date}",
+    "acceptOffer": "اقبل واستلم السيولة",
+    "rejectOffer": "ليس الآن",
+    "outstanding": "الرصيد المتبقي",
+    "statusActive": "نشط",
+    "statusRepaid": "مُسدَّد بالكامل",
+    "repaidOf": "من إجمالي {total}",
+    "costPrice": "المبلغ الممنوح (سعر التكلفة)",
+    "profit": "الربح المُفصَح عنه",
+    "totalDue": "إجمالي المستحق",
+    "scheduleTitle": "جدول السداد",
+    "schedule": { "paid": "مُسدَّد", "partial": "جزئي", "pending": "معلّق" }
+  },
+  "admin": {
+    "title": "المحفظة",
+    "subtitle": "لوحة المُقيّم الائتماني البنكي",
+    "simDate": "التاريخ المحاكى: {date}",
+    "advanceDay": "تقدّم يوماً واحداً",
+    "activeContracts": "العقود النشطة",
+    "disbursed": "إجمالي المصروف",
+    "outstanding": "إجمالي المتبقي",
+    "expectedRevenue": "الإيراد المتوقع",
+    "funnelTitle": "قمع الإصدار",
+    "funnel": {
+      "registered": "مُسجَّل",
+      "connected": "مرتبط",
+      "scored": "مُقيَّم",
+      "offered": "معروض",
+      "accepted": "مقبول"
+    },
+    "riskTitle": "توزيع المخاطر",
+    "bandLabel": "الفئة {band}",
+    "alertsTitle": "تنبيهات المخاطر",
+    "openAlerts": "{count} مفتوحة",
+    "noAlerts": "لا توجد تنبيهات مفتوحة.",
+    "merchantsTitle": "التجّار",
+    "verified": "موثّق"
   }
 }
