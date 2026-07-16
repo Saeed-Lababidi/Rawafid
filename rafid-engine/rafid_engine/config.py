@@ -125,10 +125,26 @@ class ConfidenceParams:
     medium_band: float = 0.55
 
 
+# Sales platform names recognized in meta.sources_connected for confidence's
+# source-coverage check (see confidence.py). Add new platforms here as they're
+# integrated — this is data, not logic, so it never needs a code change elsewhere.
+KNOWN_SALES_PLATFORMS: frozenset[str] = frozenset({
+    "jahez", "foodics", "salla", "zid", "hungerstation",
+})
+
+@dataclass(frozen=True)
+class ExplainParams:
+    """Tunable parameters for the explainability layer (strengths/weaknesses/next steps)."""
+
+    strength_threshold: float = 0.75  # sub-score at/above which a factor is a genuine strength
+    impact_target: float = 0.90       # target sub-score used to estimate next-step score impact
+
+
 THRESHOLDS = Thresholds()
 PRODUCT = ProductParams()
 SCORING = ScoringParams()
 CONFIDENCE = ConfidenceParams()
+EXPLAIN = ExplainParams()
 
 
 def validate_config() -> None:
