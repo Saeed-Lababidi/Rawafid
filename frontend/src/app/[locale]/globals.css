@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+
+/* Class-based dark mode keyed off the `.dark` class next-themes toggles on
+   <html> (server-resolved from the theme cookie, D-11/FOUND-02) — Tailwind v4
+   defaults `dark:` to prefers-color-scheme, this opts into the selector
+   strategy instead. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand tokens (RAFID_FRONTEND_HANDOFF.md §1, locked verbatim) */
+  --color-brand-navy: #032341;
+  --color-brand-terra: #c36b4e;
+  --color-brand-purple: #8980bc;
+  --color-brand-cream: #f6e7dc;
+
+  /* Semantic surface layer (D-09) — light defaults here, dark reassigned
+     under .dark below so every bg/text/border utility using these tokens
+     flips for free */
+  --color-page-bg: #f7f2ec;
+  --color-card: #ffffff;
+  --color-card-border: #ede3d6;
+  --color-hairline: #f0e7da;
+  --color-hairline-strong: #e9dfd3;
+  --color-muted-text: #8a7e70;
+  --color-body-text: #4a4238;
+  --color-body-text-muted: #6b6156;
+
+  /* Accent — reserved for CTA fill, active toggle state, link underline,
+     brand-mark stroke only (UI-SPEC "Accent reserved for") */
+  --color-accent: #c36b4e;
+  --color-accent-foreground: #ffffff;
+
+  /* Raw risk-band swatches (score gauges / status dots — not chips) */
+  --color-risk-a: #2f6140;
+  --color-risk-b: #2f6140;
+  --color-risk-c: #c36b4e;
+  --color-risk-d: #d0402e;
+
+  /* Risk-band chip triples — one chip anatomy reused across risk + alert
+     severity scales (D-12). Alert medium/high reuse the warn/destructive
+     triples per UI-SPEC; alert low gets its own info/purple triple. */
+  --color-chip-good-bg: #eaf2ea;
+  --color-chip-good-text: #2f6140;
+  --color-chip-good-border: #cde0cf;
+
+  --color-chip-warn-bg: #f1e4db;
+  --color-chip-warn-text: #c36b4e;
+  --color-chip-warn-border: #e4cdbf;
+
+  --color-chip-destructive-bg: #f7deda;
+  --color-chip-destructive-text: #d0402e;
+  --color-chip-destructive-border: #ebc0b8;
+
+  --color-chip-info-bg: #edebf5;
+  --color-chip-info-text: #6f67a8;
+  --color-chip-info-border: #dad6ec;
+
+  /* Radii */
+  --radius-card: 18px;
+  --radius-tile: 12px;
+  --radius-pill: 999px;
+
+  /* Phase-1 Active Type Set — 4 sizes / 2 weights, hard cap (UI-SPEC Typography) */
+  --text-meta: 12px;
+  --text-meta--line-height: 1.4;
+  --text-body: 14px;
+  --text-body--line-height: 1.5;
+  --text-h1: 28px;
+  --text-h1--line-height: 1.2;
+  --text-display: 40px;
+  --text-display--line-height: 1.15;
+
+  /* Reserved tokens — declared now, first rendered Phase 3+ (do not remove) */
+  --text-card-heading: 17px;
+  --text-card-heading--line-height: 1.3;
+  --font-weight-chip: 500;
+
+  /* IBM Plex Sans Arabic — CSS variable supplied by next/font in
+     [locale]/layout.tsx; ui-sans-serif/system-ui are the fallback stack */
+  --font-sans: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Dark theme overrides (D-10) — deep-navy surfaces, cream-tinted text,
+   terra/purple accents lightened for WCAG AA on navy. */
+.dark {
+  --color-page-bg: #081c30;
+  --color-card: #0f2b47;
+  --color-card-border: #1b3b5c;
+  --color-hairline: #16324f;
+  --color-hairline-strong: #1c3a5c;
+  --color-muted-text: #9c8f7e;
+  --color-body-text: #f3e9dd;
+  --color-body-text-muted: #c9beb0;
+
+  --color-brand-terra: #d98a67;
+  --color-brand-purple: #a79fd1;
+  --color-accent: #d98a67;
+
+  --color-risk-a: #7fcb93;
+  --color-risk-b: #7fcb93;
+  --color-risk-c: #d98a67;
+  --color-risk-d: #e36b58;
+
+  --color-chip-good-bg: #12321f;
+  --color-chip-good-text: #7fcb93;
+  --color-chip-good-border: #1d4a2c;
+
+  --color-chip-warn-bg: #3a2418;
+  --color-chip-warn-text: #e2916a;
+  --color-chip-warn-border: #4a3020;
+
+  --color-chip-destructive-bg: #3a1414;
+  --color-chip-destructive-text: #f08080;
+  --color-chip-destructive-border: #5c1f1f;
+
+  --color-chip-info-bg: #262047;
+  --color-chip-info-text: #b3abe0;
+  --color-chip-info-border: #332b5c;
+}
+
+body {
+  background-color: var(--color-page-bg);
+  color: var(--color-body-text);
+}
