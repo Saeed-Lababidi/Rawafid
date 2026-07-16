@@ -14,6 +14,13 @@ class Settings(BaseSettings):
     app_name: str = "Rafid API"
     env: str = "dev"
 
+    # Comma-separated exact origins. Deployments override with their real frontend
+    # origin; the default covers local Next.js dev only.
+    cors_origins: str = "http://localhost:3000,http://localhost:3001"
+
+    def cors_origin_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
     database_url: str = "postgresql+asyncpg://rafid:rafid@localhost:5433/rafid"
     auto_create_tables: bool = True
 
