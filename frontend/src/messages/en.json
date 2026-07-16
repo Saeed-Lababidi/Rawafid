@@ -1,0 +1,42 @@
+{
+  "brand": {
+    "name": "Rafid",
+    "tagline": "Smart financing for your business, built on your data"
+  },
+  "nav": {
+    "languageToggle": "عربي",
+    "languageToggleAria": "Switch to Arabic",
+    "themeToggleToDark": "Switch to dark mode",
+    "themeToggleToLight": "Switch to light mode",
+    "skipToContent": "Skip to content"
+  },
+  "hero": {
+    "headline": "Smart financing for your business, built on your data",
+    "subheadline": "Connect your bank and sales platforms and receive Sharia-compliant Murabaha funding against your confirmed receivables — with a transparent, explainable credit assessment.",
+    "cta": "How Rafid works"
+  },
+  "howItWorks": {
+    "title": "How Rafid works",
+    "step1": {
+      "title": "Connect your accounts",
+      "body": "Rafid aggregates 90 days of your bank and sales-platform data via open banking, with your consent."
+    },
+    "step2": {
+      "title": "Transparent credit score",
+      "body": "The Rafid engine scores your creditworthiness with a transparent, explainable model — with clear reasons behind every decision."
+    },
+    "step3": {
+      "title": "Murabaha that repays itself",
+      "body": "Receive Murabaha cash against your confirmed receivables, with repayment auto-collected from your incoming settlements."
+    }
+  },
+  "health": {
+    "checking": "Checking…",
+    "live": "Live",
+    "offline": "Offline",
+    "offlineTooltip": "Can't reach the server, retrying…"
+  },
+  "disclaimer": {
+    "text": "Demo dataset for presentation purposes only — not real bank accounts."
+  }
+}
