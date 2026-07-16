@@ -144,5 +144,24 @@ def validate_config() -> None:
     if conf_total != 1.0:
         raise ValueError(f"Confidence weights must sum to 1.0, got {conf_total}")
 
+    # Grade bands and the approval threshold are configured independently.
+    # If they ever drift apart, an "approved" decision could resolve to a grade
+    # whose risk_multiplier is 0 -> recommended_amount=0 on an approval. Guard it.
+    grade_at_threshold = None
+    for min_score, grade, _ar, _en in GRADE_BANDS:
+        if THRESHOLDS.approve_score >= min_score:
+            grade_at_threshold = grade
+            break
+    if grade_at_threshold is None:
+        raise ValueError("approve_score does not resolve to any configured grade band")
+    multiplier = PRODUCT.risk_multiplier.get(grade_at_threshold, 0.0)
+    if multiplier <= 0.0:
+        raise ValueError(
+            f"approve_score ({THRESHOLDS.approve_score}) resolves to grade "
+            f"'{grade_at_threshold}', whose risk_multiplier is {multiplier}. "
+            "An approved decision would get a 0 SAR advance. Align THRESHOLDS."
+            "approve_score with a grade band that has a nonzero risk_multiplier."
+        )
+
 
 validate_config()
