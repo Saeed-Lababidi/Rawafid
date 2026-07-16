@@ -35,17 +35,17 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User sees the demo-dataset disclaimer visible in the UI
   5. The deployed frontend reaches the free-hosted backend + Postgres with no cold-start risk (health check passes, CORS allows only the Vercel origin, API URL is env-driven), and demo data can be reset remotely
 
-**Plans**: 4 plans
+**Plans**: 2/4 plans executed
 
 Plans:
 **Wave 1**
 
 - [ ] 01-01-PLAN.md — Deploy backend + Neon Postgres to Railway (repo-root Dockerfile, CORS allow-list, asyncpg TLS, fresh secrets, remote demo-reset) — DEPLOY-01/02/03
-- [ ] 01-02-PLAN.md — Scaffold Next.js + Tailwind v4, next-intl [locale] RTL/LTR routing (ar default, cookie-persisted), central bidi-safe format utility, env-driven API URL — FOUND-01, FOUND-05
+- [x] 01-02-PLAN.md — Scaffold Next.js + Tailwind v4, next-intl [locale] RTL/LTR routing (ar default, cookie-persisted), central bidi-safe format utility, env-driven API URL — FOUND-01, FOUND-05
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-03-PLAN.md — @theme token system (handoff §1 + dark + risk-D + severity chips), IBM Plex Sans Arabic, flash-free cookie-resolved theming, header/footer chrome, health badge, disclaimer, landing page 390px→desktop — FOUND-02/03/04/06/07
+- [x] 01-03-PLAN.md — @theme token system (handoff §1 + dark + risk-D + severity chips), IBM Plex Sans Arabic, flash-free cookie-resolved theming, header/footer chrome, health badge, disclaimer, landing page 390px→desktop — FOUND-02/03/04/06/07
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -151,7 +151,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Live Bilingual Foundation | 0/4 | Not started | - |
+| 1. Live Bilingual Foundation | 2/4 | In Progress|  |
 | 2. Authenticated Typed API Layer | 0/2 | Not started | - |
 | 3. Merchant Core Loop | 0/3 | Not started | - |
 | 4. Admin Surface & Demo Choreography | 0/2 | Not started | - |

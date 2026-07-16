@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 1
-current_phase_name: Live Bilingual Foundation
+current_phase: 01
+current_phase_name: live-bilingual-foundation
 status: executing
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-07-15T21:52:23.782Z"
-last_activity: 2026-07-15
-last_activity_desc: Roadmap created (5 phases, 36 requirements mapped, 100% coverage)
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-07-16T06:39:16.323Z"
+last_activity: 2026-07-16
+last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 2
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** A judge can experience the complete merchant loop live — connect accounts → explainable score reveal → Murabaha offer → a contract that visibly repays itself in real time — in a polished Arabic-first UI that looks professional and worth a fortune.
-**Current focus:** Phase 1 — Live Bilingual Foundation
+**Current focus:** Phase 01 — live-bilingual-foundation
 
 ## Current Position
 
-Phase: 1 of 5 (Live Bilingual Foundation)
-Plan: 0 of 2 in current phase
+Phase: 01 (live-bilingual-foundation) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-15 — Roadmap created (5 phases, 36 requirements mapped, 100% coverage)
+Last activity: 2026-07-16 — Phase 01 execution started
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -54,6 +54,11 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P03 | 55min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -66,6 +71,8 @@ Recent decisions affecting current work:
 - [Roadmap]: i18n (ar+en) + dark mode + design tokens scaffolded in Phase 1, never retrofitted — every paint-before-JS pitfall (RTL/theme flash, bidi, font FOUT) is far costlier once screens exist
 - [Roadmap]: WOW animation polish isolated to final Phase 5 per handoff §7 integration-first build order
 - [Roadmap]: Shared 401 refresh-mutex built in Phase 2 before any polling screen (Phase 3) to prevent false logout under concurrent polling
+- [Phase ?]: 01-03: [locale]/layout.tsx is the root layout (deleted app/layout.tsx/globals.css) — Next.js requires exactly one html/body definition above any page; a dynamic-segment root layout is the documented i18n pattern
+- [Phase ?]: 01-03: health-badge and theme-toggle use useSyncExternalStore instead of useEffect+setState to satisfy eslint-plugin-react-hooks set-state-in-effect
 
 ### Pending Todos
 
@@ -91,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T17:11:46.289Z
-Stopped at: Phase 1 UI-SPEC approved
-Resume file: .planning/phases/01-live-bilingual-foundation/01-UI-SPEC.md
+Last session: 2026-07-16T06:39:16.309Z
+Stopped at: Completed 01-03-PLAN.md
+Resume file: None
