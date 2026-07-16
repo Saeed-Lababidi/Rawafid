@@ -13,7 +13,7 @@ A judge experiences the complete merchant loop live. We get there by standing up
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Live Bilingual Foundation** - Deployed RTL/LTR, flash-free themed Next.js shell on real free hosts (backend + Postgres + Vercel), remote-resettable
+- [x] **Phase 1: Live Bilingual Foundation** - Deployed RTL/LTR, flash-free themed Next.js shell on real free hosts (backend + Postgres + Vercel), remote-resettable (completed 2026-07-16)
 - [ ] **Phase 2: Authenticated Typed API Layer** - Register/login against live backend via generated typed client, shared refresh-mutex, role routing, error contract
 - [ ] **Phase 3: Merchant Core Loop** - Connect → aggregate → dashboard → explainable score → Murabaha offer → live self-repaying contract → alerts → settings
 - [ ] **Phase 4: Admin Surface & Demo Choreography** - Bank-admin portfolio, merchant drill-down, underwriting annotate, demo-tick + settlement-receive + account quick-switch
@@ -35,12 +35,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User sees the demo-dataset disclaimer visible in the UI
   5. The deployed frontend reaches the free-hosted backend + Postgres with no cold-start risk (health check passes, CORS allows only the Vercel origin, API URL is env-driven), and demo data can be reset remotely
 
-**Plans**: 2/4 plans executed
+**Plans**: 4/4 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Deploy backend + Neon Postgres to Railway (repo-root Dockerfile, CORS allow-list, asyncpg TLS, fresh secrets, remote demo-reset) — DEPLOY-01/02/03
+- [x] 01-01-PLAN.md — Deploy backend + Neon Postgres to Railway (repo-root Dockerfile, CORS allow-list, asyncpg TLS, fresh secrets, remote demo-reset) — DEPLOY-01/02/03
 - [x] 01-02-PLAN.md — Scaffold Next.js + Tailwind v4, next-intl [locale] RTL/LTR routing (ar default, cookie-persisted), central bidi-safe format utility, env-driven API URL — FOUND-01, FOUND-05
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -49,7 +49,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-04-PLAN.md — Vercel cutover (Root Directory frontend/, NEXT_PUBLIC_API_URL), live E2E verification (routing, CORS pair, badge Live, no-flash, 390px visual) — DEPLOY-02, FOUND-02/06 live checks
+- [x] 01-04-PLAN.md — Vercel cutover (Root Directory frontend/, NEXT_PUBLIC_API_URL), live E2E verification (routing, CORS pair, badge Live, no-flash, 390px visual) — DEPLOY-02, FOUND-02/06 live checks
 
 **UI hint**: yes
 
@@ -151,7 +151,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Live Bilingual Foundation | 2/4 | In Progress|  |
+| 1. Live Bilingual Foundation | 4/4 | Complete    | 2026-07-16 |
 | 2. Authenticated Typed API Layer | 0/2 | Not started | - |
 | 3. Merchant Core Loop | 0/3 | Not started | - |
 | 4. Admin Surface & Demo Choreography | 0/2 | Not started | - |

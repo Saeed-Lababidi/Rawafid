@@ -9,11 +9,11 @@ Requirements for the July 17, 2026 judging demo. Each maps to roadmap phases.
 
 ### Foundation (scaffold — never retrofit)
 
-- [ ] **FOUND-01**: User sees the app in Arabic (RTL) by default and can switch to English (LTR) with full copy parity, via locale-prefixed routes
+- [x] **FOUND-01**: User sees the app in Arabic (RTL) by default and can switch to English (LTR) with full copy parity, via locale-prefixed routes
 - [x] **FOUND-02**: User can toggle dark/light mode with no flash of wrong theme on load (server-resolved, persisted)
 - [x] **FOUND-03**: User sees handoff §1 design tokens (colors, type scale, radii) applied consistently in both themes, extended with risk-band-D and alert-severity (low/medium/high) scales
 - [x] **FOUND-04**: User sees IBM Plex Sans Arabic loaded without FOUT/layout shift (next/font, preloaded weights)
-- [ ] **FOUND-05**: User sees all numbers, currency, and dates rendered bidi-safe through one central formatting utility (no mixed-direction glitches in Arabic)
+- [x] **FOUND-05**: User sees all numbers, currency, and dates rendered bidi-safe through one central formatting utility (no mixed-direction glitches in Arabic)
 - [x] **FOUND-06**: User gets a correct layout from 390px mobile through desktop on every screen
 - [x] **FOUND-07**: User sees the demo-dataset disclaimer visible in the UI
 
@@ -52,9 +52,9 @@ Requirements for the July 17, 2026 judging demo. Each maps to roadmap phases.
 
 ### Deployment (live demo, zero budget)
 
-- [ ] **DEPLOY-01**: Backend + Postgres run on a free host with no cold-start risk during judging (Railway + Neon primary; Render + UptimeRobot keep-alive fallback), provisioned early with expiry checked against July 17
-- [ ] **DEPLOY-02**: Frontend deploys on the existing Vercel project, pointed at the deployed backend (CORS allow-list, env-driven API URL, types regenerated against deployed openapi.json)
-- [ ] **DEPLOY-03**: Demo data can be reset remotely on the deployed backend (host console or guarded path for `make reset`)
+- [x] **DEPLOY-01**: Backend + Postgres run on a free host with no cold-start risk during judging (Railway + Neon primary; Render + UptimeRobot keep-alive fallback), provisioned early with expiry checked against July 17
+- [x] **DEPLOY-02**: Frontend deploys on the existing Vercel project, pointed at the deployed backend (CORS allow-list, env-driven API URL, types regenerated against deployed openapi.json)
+- [x] **DEPLOY-03**: Demo data can be reset remotely on the deployed backend (host console or guarded path for `make reset`)
 
 ### WOW polish (full handoff §8 set)
 
@@ -93,16 +93,16 @@ Which phases cover which requirements. Populated during roadmap creation (2026-0
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
-| FOUND-05 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Complete |
 | FOUND-06 | Phase 1 | Complete |
 | FOUND-07 | Phase 1 | Complete |
-| DEPLOY-01 | Phase 1 | Pending |
-| DEPLOY-02 | Phase 1 | Pending |
-| DEPLOY-03 | Phase 1 | Pending |
+| DEPLOY-01 | Phase 1 | Complete |
+| DEPLOY-02 | Phase 1 | Complete |
+| DEPLOY-03 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
