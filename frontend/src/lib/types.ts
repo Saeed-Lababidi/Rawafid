@@ -103,14 +103,131 @@ export interface ScoringFeatures {
   account_age_days: number;
   platform_mix: Record<string, number>;
 }
-// The engine's real verdict is three-way (rafid-engine `Outcome`); the
-// backend's `approved` boolean flattens `review` into `false`. Stage 1 renders
-// the full engine Decision — this minimal shape is what Stage 0 needs to stop
-// mislabelling a reviewable merchant as declined.
-export type EngineOutcome = 'approve' | 'review' | 'decline';
+// ---- rafid-engine Decision ----
+// Mirrors rafid-engine/rafid_engine/schema.py, verified against real engine
+// output. The backend persists this verbatim on `decision.engine_decision`
+// whenever SCORING_BACKEND=module (production); stub/http backends leave it
+// null, so every consumer must treat it as optional.
 
-export interface EngineDecisionPartial {
-  funding_recommendation?: { decision?: EngineOutcome };
+/** Bilingual string. The engine narrates natively in both languages. */
+export interface Localized {
+  ar: string;
+  en: string;
+}
+
+export type EngineOutcome = 'approve' | 'review' | 'decline';
+export type HealthStatus = 'strong' | 'stable' | 'fragile' | 'distressed' | 'unknown';
+export type ConfidenceBand = 'high' | 'medium' | 'low';
+export type Polarity = 'positive' | 'negative' | 'neutral';
+/** A+ | A | A- | B+ | B | B- | C | D (config.GRADE_BANDS). */
+export type EngineGrade = string;
+
+export interface FactorContribution {
+  code: string;
+  name: Localized;
+  weight: number;
+  /** 0..1 — how well this factor scored on its own. */
+  sub_score: number;
+  /** Share of the score this factor accounts for, as a percentage — NOT points. */
+  contribution_pct: number;
+  polarity: Polarity;
+  detail: Localized;
+}
+
+export interface EngineRiskScore {
+  /** 300..850. Note this is NOT the /1000 scale the backend docstring claims. */
+  value_850: number;
+  normalized: number;
+  grade: EngineGrade;
+  band: Localized;
+  factors: FactorContribution[];
+}
+
+export interface ConfidenceDriver {
+  code: string;
+  detail: Localized;
+}
+
+export interface EngineConfidence {
+  value: number;
+  band: ConfidenceBand;
+  drivers: ConfidenceDriver[];
+}
+
+/**
+ * One projected collection against an upcoming settlement.
+ * `projected: true` means it is scheduled against a forecast settlement cycle
+ * rather than a settlement that already exists.
+ */
+export interface EngineDeduction {
+  date: string;
+  settlement_expected: number;
+  deduction: number;
+  projected: boolean;
+}
+
+export interface EngineRepayment {
+  method: string;
+  schedule: EngineDeduction[];
+  expected_payoff_date: string | null;
+}
+
+export interface EngineFee {
+  type: string;
+  rate: number;
+  amount: number;
+}
+
+export interface EngineFundingRecommendation {
+  decision: EngineOutcome;
+  recommended_amount: number;
+  max_amount: number;
+  advance_rate_effective: number;
+  currency: string;
+  /**
+   * The engine's own single Murabaha fee (2.1%). This is NOT the fee schedule
+   * the backend actually contracts on — services/offers.py prices an offer with
+   * three separate percentages (platform 2% + success 1% + profit 6%). Never
+   * render this next to a real offer; the offer's own figures are the binding
+   * ones. See docs in components/engine/repayment-projection.tsx.
+   */
+  fee: EngineFee;
+  total_repayment: number;
+  repayment: EngineRepayment;
+}
+
+export interface EngineInsight {
+  code: string;
+  text: Localized;
+}
+
+export interface EngineNextStep {
+  code: string;
+  text: Localized;
+  potential_impact: string | null;
+}
+
+export interface EngineAudit {
+  rules_fired: string[];
+  thresholds_version: string;
+  generated_at: string;
+  stub: boolean;
+}
+
+export interface EngineDecision {
+  engine_version: string;
+  assessment_id: string;
+  as_of: string;
+  currency: string;
+  credit_assessment: { health: HealthStatus; health_label: Localized };
+  risk_score: EngineRiskScore;
+  confidence: EngineConfidence;
+  funding_recommendation: EngineFundingRecommendation;
+  explanation: { summary: Localized };
+  strengths: EngineInsight[];
+  weaknesses: EngineInsight[];
+  next_steps: EngineNextStep[];
+  audit: EngineAudit;
 }
 
 export interface CreditDecision {
@@ -124,8 +241,8 @@ export interface CreditDecision {
   model_version: string;
   // Full rafid-engine Decision, persisted verbatim. Present only when the
   // backend runs SCORING_BACKEND=module (it does in production); the stub and
-  // http models leave it null. Typed in full in Stage 1.
-  engine_decision?: EngineDecisionPartial | null;
+  // http models leave it null.
+  engine_decision?: EngineDecision | null;
 }
 export interface AssessmentOut {
   id: string;

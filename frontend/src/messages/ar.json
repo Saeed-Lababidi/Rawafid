@@ -47,6 +47,27 @@
     "financing": "التمويل",
     "portfolio": "المحفظة"
   },
+  "engine": {
+    "confidenceTitle": "ثقة القرار",
+    "confidenceHint": "حجم البيانات التي يستند إليها هذا التقييم — منفصلة عن الدرجة نفسها.",
+    "confidenceBand": { "high": "ثقة عالية", "medium": "ثقة متوسطة", "low": "ثقة منخفضة" },
+    "factorsTitle": "العوامل السبعة",
+    "factorsHint": "نصيب كل عامل من درجتك، وهل رفعها أم خفضها.",
+    "factorWeight": "الوزن {pct}٪",
+    "strengthsTitle": "نقاط القوة",
+    "weaknessesTitle": "ما الذي يحدّ من تقييمك",
+    "none": "لا يوجد.",
+    "nextStepsTitle": "كيف ترفع تقييمك",
+    "repaymentTitle": "كيف سيتم السداد",
+    "repaymentHint": "توقّع استرشادي — يُحصّل تلقائياً من تسوياتك القادمة. تظهر شروطك النهائية في العرض.",
+    "projected": "متوقّعة",
+    "ofSettlement": "من {amount} متوقعة",
+    "payoffBy": "السداد الكامل بحلول {date}",
+    "poweredBy": "محرك رافد v{version}",
+    "thresholds": "مجموعة القواعد {version}",
+    "rulesFired": "{count} قاعدة مُفعّلة",
+    "modelVersion": "النموذج {version}"
+  },
   "state": {
     "errorTitle": "تعذّر تحميل هذا",
     "errorBody": "لم يستجب الخادم كما هو متوقع.",

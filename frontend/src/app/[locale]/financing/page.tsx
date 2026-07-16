@@ -8,6 +8,15 @@ import { Button, Card, Chip, RiskChip } from '@/components/ui/primitives';
 import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { ContributionBars, ScoreGauge } from '@/components/ui/charts';
 import { bandColor } from '@/components/ui/charts';
+import {
+  AuditStrip,
+  ConfidencePanel,
+  ExplanationPanel,
+  FactorBars,
+  InsightsPanel,
+  NextStepsPanel,
+  RepaymentProjection,
+} from '@/components/engine/engine-panels';
 import { useToast } from '@/components/providers/toast-provider';
 import {
   acceptOffer,
@@ -22,6 +31,7 @@ import {
 } from '@/lib/api';
 import { POLL, qk } from '@/lib/query';
 import { outcomeOf } from '@/lib/decision';
+import { engineOf, SCORE_MAX, scoreFraction } from '@/lib/engine';
 import { formatCurrency, formatDate, type Locale } from '@/lib/format';
 import type { AssessmentDetailOut, ContractDetailOut, OfferOut } from '@/lib/types';
 
@@ -340,14 +350,18 @@ function AssessmentView({
   locale: Locale;
 }) {
   const t = useTranslations('financing');
+  const tEngine = useTranslations('engine');
   const { decision } = assessment;
   // The engine decides approve / review / decline; `decision.approved` folds
   // `review` into false, which would tell a reviewable merchant they were
   // rejected. Read the engine's real verdict instead.
   const outcome = outcomeOf(decision);
-  const contributions = Object.entries(decision.feature_contributions)
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+  const engine = engineOf(decision);
+
+  // Grade ("A-") is finer-grained than the persisted risk_band ("A"); prefer it
+  // when the engine payload is present.
+  const grade = engine?.risk_score.grade ?? assessment.risk_band;
+  const fraction = engine ? scoreFraction(assessment.score) : assessment.score / 1000;
 
   return (
     <div className="flex flex-col gap-6">
@@ -356,6 +370,7 @@ function AssessmentView({
           <div className="flex items-center gap-2">
             <span className="text-meta text-body-text-muted">{t('yourScore')}</span>
             <RiskChip band={assessment.risk_band} />
+            {engine ? <Chip tone="neutral">{grade}</Chip> : null}
           </div>
           {outcome === 'approve' ? (
             <div className="flex items-center gap-2 text-risk-a">
@@ -373,7 +388,12 @@ function AssessmentView({
             <span className="text-body font-bold text-risk-d">{t('declined')}</span>
           )}
         </div>
-        <ScoreGauge score={assessment.score} colorVar={bandColor(assessment.risk_band)} />
+        <ScoreGauge
+          score={assessment.score}
+          fraction={fraction}
+          maxLabel={engine ? `/ ${SCORE_MAX}` : '/ 1000'}
+          colorVar={bandColor(assessment.risk_band)}
+        />
       </Card>
 
       {outcome === 'review' ? (
@@ -382,28 +402,55 @@ function AssessmentView({
         </Card>
       ) : null}
 
-      <Card className="flex flex-col gap-3">
-        <h2 className="text-body font-bold text-body-text">{t('whyTitle')}</h2>
-        <ul className="flex flex-col gap-1.5">
-          {decision.reasons.map((r, i) => (
-            <li key={i} className="flex gap-2 text-body text-body-text-muted">
-              <span className="text-accent">•</span>
-              {r}
-            </li>
-          ))}
-        </ul>
-      </Card>
+      {engine ? (
+        <>
+          <ExplanationPanel decision={engine} />
+          <InsightsPanel strengths={engine.strengths} weaknesses={engine.weaknesses} />
+          <FactorBars riskScore={engine.risk_score} />
+          <ConfidencePanel confidence={engine.confidence} />
+          <NextStepsPanel steps={engine.next_steps} />
+          <RepaymentProjection repayment={engine.funding_recommendation.repayment} />
+        </>
+      ) : (
+        /* Stub/http scoring backend: no engine payload, fall back to the flat
+           reasons list and unsigned contribution bars. */
+        <>
+          <Card className="flex flex-col gap-3">
+            <h2 className="text-body font-bold text-body-text">{t('whyTitle')}</h2>
+            <ul className="flex flex-col gap-1.5">
+              {decision.reasons.map((r, i) => (
+                <li key={i} className="flex gap-2 text-body text-body-text-muted">
+                  <span className="text-accent">•</span>
+                  {r}
+                </li>
+              ))}
+            </ul>
+          </Card>
 
-      <Card className="flex flex-col gap-4">
-        <h2 className="text-body font-bold text-body-text">{t('contributionsTitle')}</h2>
-        <ContributionBars items={contributions} />
-      </Card>
+          <Card className="flex flex-col gap-4">
+            <h2 className="text-body font-bold text-body-text">{t('contributionsTitle')}</h2>
+            <ContributionBars
+              items={Object.entries(decision.feature_contributions)
+                .map(([label, value]) => ({ label, value }))
+                .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))}
+            />
+          </Card>
+        </>
+      )}
 
       {outcome === 'approve' ? (
         <Button loading={busy} onClick={onGenerateOffer} className="self-start">
           {t('generateOffer')}
         </Button>
       ) : null}
+
+      {engine ? (
+        <AuditStrip audit={engine.audit} engineVersion={engine.engine_version} />
+      ) : (
+        <p className="text-meta text-muted-text">
+          {tEngine('modelVersion', { version: decision.model_version })}
+        </p>
+      )}
     </div>
   );
 }

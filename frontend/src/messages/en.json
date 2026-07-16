@@ -47,6 +47,27 @@
     "financing": "Financing",
     "portfolio": "Portfolio"
   },
+  "engine": {
+    "confidenceTitle": "Decision confidence",
+    "confidenceHint": "How much data stands behind this assessment — separate from the score itself.",
+    "confidenceBand": { "high": "High confidence", "medium": "Medium confidence", "low": "Low confidence" },
+    "factorsTitle": "The seven factors",
+    "factorsHint": "Each factor's share of your score, and whether it helped or held you back.",
+    "factorWeight": "Weight {pct}%",
+    "strengthsTitle": "Strengths",
+    "weaknessesTitle": "What's holding you back",
+    "none": "None identified.",
+    "nextStepsTitle": "How to improve your score",
+    "repaymentTitle": "How repayment would work",
+    "repaymentHint": "Indicative projection — collected automatically from your upcoming settlements. Your final terms appear on the offer.",
+    "projected": "Forecast",
+    "ofSettlement": "of {amount} expected",
+    "payoffBy": "Fully repaid by {date}",
+    "poweredBy": "Rafid Engine v{version}",
+    "thresholds": "Ruleset {version}",
+    "rulesFired": "{count} rules fired",
+    "modelVersion": "Model {version}"
+  },
   "state": {
     "errorTitle": "Couldn't load this",
     "errorBody": "The server didn't respond as expected.",

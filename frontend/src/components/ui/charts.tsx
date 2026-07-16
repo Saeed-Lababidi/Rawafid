@@ -73,13 +73,25 @@ export function ContributionBars({
   );
 }
 
-// Circular score gauge, 0..1000. Arc colour keyed to the risk band swatch.
-export function ScoreGauge({ score, colorVar }: { score: number; colorVar: string }) {
+// Circular score gauge over the engine's 300..850 scale. Arc colour keyed to
+// the risk-band swatch. `fraction` is supplied by the caller (lib/engine.ts)
+// rather than derived here, so the scale lives in exactly one place.
+export function ScoreGauge({
+  score,
+  fraction,
+  maxLabel,
+  colorVar,
+}: {
+  score: number;
+  fraction: number;
+  maxLabel: string;
+  colorVar: string;
+}) {
   const size = 180;
   const stroke = 14;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const pct = Math.max(0, Math.min(1, score / 1000));
+  const pct = Math.max(0, Math.min(1, fraction));
   return (
     <svg viewBox={`0 0 ${size} ${size}`} className="h-44 w-44" role="img">
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-hairline-strong)" strokeWidth={stroke} />
@@ -114,7 +126,7 @@ export function ScoreGauge({ score, colorVar }: { score: number; colorVar: strin
         fill="var(--color-muted-text)"
         style={{ fontSize: 12 }}
       >
-        / 1000
+        {maxLabel}
       </text>
     </svg>
   );
