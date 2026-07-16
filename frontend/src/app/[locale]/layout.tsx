@@ -6,6 +6,8 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
 import { routing } from '@/i18n/routing';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import './globals.css';
 
 // FOUND-04: only 400/700 render in Phase 1 (weight 500 is a reserved token,
@@ -58,16 +60,11 @@ export default async function LocaleLayout({ children, params }: Props) {
             >
               {t('skipToContent')}
             </a>
-            {/* Header/Footer land in Task 2 — placeholder chrome keeps the build green */}
-            <header className="border-b border-hairline bg-card p-4 text-h1 font-bold text-brand-navy dark:text-brand-cream">
-              رافد
-            </header>
+            <Header />
             <main id="main-content" className="flex-1">
               {children}
             </main>
-            <footer className="border-t border-hairline bg-card p-4 text-meta text-muted-text">
-              {t('skipToContent')}
-            </footer>
+            <Footer />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
