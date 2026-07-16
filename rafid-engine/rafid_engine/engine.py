@@ -3,10 +3,8 @@
 ``assess(features) -> Decision`` and ``quote(basis, amount) -> Offer`` are the
 entire integration surface. Both are pure: no database, no network.
 
-A2 status: ``risk_score`` and ``credit_assessment`` are now REAL (transparent
-seven-factor scorecard). ``funding_recommendation``, ``confidence``,
-``explanation``, and the insight lists remain placeholders until A3–A5, so
-``assess`` still flags ``audit.stub = True`` until the full pipeline is live.
+Pipeline is complete: scorecard, confidence, decision gates, exposure/repayment,
+and bilingual explanation all run for real. ``audit.stub`` is always ``False``.
 """
 from __future__ import annotations
 
