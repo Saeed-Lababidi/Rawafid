@@ -8,6 +8,8 @@ import { ThemeProvider } from 'next-themes';
 import { routing } from '@/i18n/routing';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import { QueryProvider } from '@/components/providers/query-provider';
+import { ToastProvider } from '@/components/providers/toast-provider';
 import './globals.css';
 
 // FOUND-04: only 400/700 render in Phase 1 (weight 500 is a reserved token,
@@ -54,17 +56,21 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className="flex min-h-screen flex-col bg-page-bg font-sans text-body-text antialiased">
         <NextIntlClientProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:inset-s-4 focus:top-4 focus:z-50 focus:rounded-pill focus:bg-accent focus:px-4 focus:py-2 focus:text-body focus:text-accent-foreground"
-            >
-              {t('skipToContent')}
-            </a>
-            <Header />
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-            <Footer />
+            <QueryProvider>
+              <ToastProvider>
+                <a
+                  href="#main-content"
+                  className="sr-only focus:not-sr-only focus:absolute focus:inset-s-4 focus:top-4 focus:z-50 focus:rounded-pill focus:bg-accent focus:px-4 focus:py-2 focus:text-body focus:text-accent-foreground"
+                >
+                  {t('skipToContent')}
+                </a>
+                <Header />
+                <main id="main-content" className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </ToastProvider>
+            </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

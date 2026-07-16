@@ -47,6 +47,13 @@
     "financing": "Financing",
     "portfolio": "Portfolio"
   },
+  "state": {
+    "errorTitle": "Couldn't load this",
+    "errorBody": "The server didn't respond as expected.",
+    "retry": "Try again",
+    "emptyTitle": "Nothing here yet",
+    "sessionExpired": "Your session expired. Please sign in again."
+  },
   "login": {
     "title": "Sign in to Rafid",
     "subtitle": "Access your financing dashboard.",
@@ -92,6 +99,9 @@
     "yourScore": "Your credit score",
     "approvedUpTo": "Approved for up to {amount}",
     "declined": "Not approved at this time.",
+    "underReview": "Referred for underwriter review",
+    "underReviewBody": "Your assessment sits just outside automatic approval, so a bank underwriter is reviewing it. You'll see their decision — and any note they leave — here.",
+    "acceptedToast": "Offer accepted. Your cash advance is on its way.",
     "whyTitle": "Why this score",
     "contributionsTitle": "What moved your score",
     "generateOffer": "See my offer",
@@ -125,6 +135,7 @@
     "subtitle": "Bank underwriter dashboard",
     "simDate": "Simulated date: {date}",
     "advanceDay": "Advance one day",
+    "tickError": "Couldn't advance the simulated day.",
     "activeContracts": "Active contracts",
     "disbursed": "Total disbursed",
     "outstanding": "Total outstanding",

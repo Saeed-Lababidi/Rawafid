@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useQueries } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight, TrendingUp } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { AppShell } from '@/components/app/app-shell';
-import { Card, Chip, Spinner, StatTile } from '@/components/ui/primitives';
+import { Card, Chip, StatTile } from '@/components/ui/primitives';
+import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { AreaChart } from '@/components/ui/charts';
 import {
   aggregate,
@@ -16,15 +17,9 @@ import {
   getSales,
   getSettlements,
 } from '@/lib/api';
+import { POLL, qk } from '@/lib/query';
 import { formatCurrency, formatDate, type Locale } from '@/lib/format';
-import type {
-  AssessmentOut,
-  ContractOut,
-  MerchantOut,
-  RiskAlertOut,
-  SalesOrderOut,
-  SettlementOut,
-} from '@/lib/types';
+import type { SalesOrderOut } from '@/lib/types';
 
 const MERCHANT_NAV = [
   { href: '/dashboard', key: 'dashboard' },
@@ -51,60 +46,59 @@ export default function DashboardPage() {
 
   const nav = MERCHANT_NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
 
-  const [merchant, setMerchant] = useState<MerchantOut | null>(null);
-  const [held, setHeld] = useState<number | null>(null);
-  const [sales, setSales] = useState<SalesOrderOut[]>([]);
-  const [settlements, setSettlements] = useState<SettlementOut[]>([]);
-  const [contracts, setContracts] = useState<ContractOut[]>([]);
-  const [assessment, setAssessment] = useState<AssessmentOut | null>(null);
-  const [alerts, setAlerts] = useState<RiskAlertOut[]>([]);
-  const [loading, setLoading] = useState(true);
+  // `aggregate` is a POST but is idempotent/incremental — re-running returns
+  // zero new rows and the current held-receivables total (FRONTEND_GUIDE §6.3),
+  // which is the hero number here. Settlements/contracts poll because the
+  // monitoring agent moves them on its own.
+  const [merchantQ, aggregateQ, salesQ, settlementsQ, contractsQ, assessmentsQ, alertsQ] =
+    useQueries({
+      queries: [
+        { queryKey: qk.merchant, queryFn: getMerchant },
+        { queryKey: qk.aggregate, queryFn: aggregate },
+        { queryKey: qk.sales(5000), queryFn: () => getSales(5000) },
+        { queryKey: qk.settlements, queryFn: getSettlements, refetchInterval: POLL.ambient },
+        { queryKey: qk.contracts, queryFn: getContracts, refetchInterval: POLL.ambient },
+        { queryKey: qk.assessments, queryFn: getAssessments },
+        { queryKey: qk.alerts, queryFn: getAlerts, refetchInterval: POLL.ambient },
+      ],
+    });
 
-  useEffect(() => {
-    let alive = true;
-    async function load() {
-      const [m, agg, s, st, c, a, al] = await Promise.all([
-        getMerchant(),
-        aggregate(),
-        getSales(),
-        getSettlements(),
-        getContracts(),
-        getAssessments(),
-        getAlerts(),
-      ]);
-      if (!alive) return;
-      setMerchant(m);
-      setHeld(agg.held_receivables_total);
-      setSales(s);
-      setSettlements(st);
-      setContracts(c);
-      setAssessment(a[0] ?? null);
-      setAlerts(al);
-      setLoading(false);
-    }
-    load().catch(() => setLoading(false));
-    const id = setInterval(() => {
-      getSettlements().then((st) => alive && setSettlements(st)).catch(() => {});
-      getContracts().then((c) => alive && setContracts(c)).catch(() => {});
-    }, 10_000);
-    return () => {
-      alive = false;
-      clearInterval(id);
-    };
-  }, []);
+  const isLoading = merchantQ.isLoading || aggregateQ.isLoading || salesQ.isLoading;
+  const isError = merchantQ.isError || aggregateQ.isError;
+  const retry = () => {
+    merchantQ.refetch();
+    aggregateQ.refetch();
+    salesQ.refetch();
+  };
 
-  const activeContract = contracts.find((c) => c.status === 'active');
-  const pending = settlements.filter((s) => s.status === 'pending');
-  const revenueSeries = dailyRevenue(sales);
+  const merchant = merchantQ.data;
+  const held = aggregateQ.data?.held_receivables_total ?? null;
+  const activeContract = contractsQ.data?.find((c) => c.status === 'active');
+  const assessment = assessmentsQ.data?.[0];
+  const alerts = alertsQ.data ?? [];
+  const pending = (settlementsQ.data ?? []).filter((s) => s.status === 'pending');
+  const revenueSeries = dailyRevenue(salesQ.data ?? []);
 
   return (
     <AppShell role="merchant" nav={nav}>
-      {() =>
-        loading ? (
-          <div className="flex min-h-[40vh] items-center justify-center">
-            <Spinner className="h-7 w-7" />
-          </div>
-        ) : (
+      {() => (
+        <QueryBoundary
+          isLoading={isLoading}
+          isError={isError}
+          onRetry={retry}
+          skeleton={
+            <div className="flex flex-col gap-6">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-36 w-full" />
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+              </div>
+              <Skeleton className="h-56 w-full" />
+            </div>
+          }
+        >
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1">
               <span className="text-meta text-muted-text">{t('greeting')}</span>
@@ -216,8 +210,8 @@ export default function DashboardPage() {
               </Card>
             </div>
           </div>
-        )
-      }
+        </QueryBoundary>
+      )}
     </AppShell>
   );
 }

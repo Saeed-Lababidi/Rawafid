@@ -1,19 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { FastForward } from 'lucide-react';
 import { AppShell } from '@/components/app/app-shell';
-import { Button, Card, Chip, Spinner, StatTile } from '@/components/ui/primitives';
+import { Button, Card, Chip, StatTile } from '@/components/ui/primitives';
+import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { bandColor, Donut, FunnelBars } from '@/components/ui/charts';
+import { useToast } from '@/components/providers/toast-provider';
 import {
   getAdminAlerts,
   getAdminMerchants,
   getPortfolio,
   monitorTick,
 } from '@/lib/api';
+import { POLL, qk } from '@/lib/query';
 import { formatCurrency, type Locale } from '@/lib/format';
-import type { MerchantOut, PortfolioOut, RiskAlertOut } from '@/lib/types';
 
 const NAV = [{ href: '/admin', key: 'portfolio' }];
 const BANDS = ['A', 'B', 'C', 'D'] as const;
@@ -25,51 +28,66 @@ export default function AdminPage() {
   const locale = useLocale() as Locale;
   const nav = NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
 
-  const [portfolio, setPortfolio] = useState<PortfolioOut | null>(null);
-  const [merchants, setMerchants] = useState<MerchantOut[]>([]);
-  const [alerts, setAlerts] = useState<RiskAlertOut[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [ticking, setTicking] = useState(false);
+  const queryClient = useQueryClient();
+  const { toastError } = useToast();
   const [simDate, setSimDate] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    const [p, m, a] = await Promise.all([getPortfolio(), getAdminMerchants(), getAdminAlerts()]);
-    setPortfolio(p);
-    setMerchants(m);
-    setAlerts(a);
-  }, []);
+  const [portfolioQ, merchantsQ, alertsQ] = useQueries({
+    queries: [
+      { queryKey: qk.adminPortfolio, queryFn: getPortfolio, refetchInterval: POLL.ambient },
+      { queryKey: qk.adminMerchants, queryFn: getAdminMerchants },
+      { queryKey: qk.adminAlerts, queryFn: getAdminAlerts, refetchInterval: POLL.ambient },
+    ],
+  });
 
-  useEffect(() => {
-    refresh()
-      .then(() => setLoading(false))
-      .catch(() => setLoading(false));
-    const id = setInterval(() => {
-      getPortfolio().then(setPortfolio).catch(() => {});
-      getAdminAlerts().then(setAlerts).catch(() => {});
-    }, 10_000);
-    return () => clearInterval(id);
-  }, [refresh]);
-
-  async function onTick() {
-    setTicking(true);
-    try {
-      const res = await monitorTick();
+  // Manual day-advance: the presenter's control when the background scheduler
+  // is disabled for a demo (MONITOR_ENABLED=false).
+  const tickM = useMutation({
+    mutationFn: monitorTick,
+    onSuccess: (res) => {
       setSimDate(res.sim_date);
-      await refresh();
-    } catch {
-      /* ignore */
-    }
-    setTicking(false);
-  }
+      queryClient.invalidateQueries({ queryKey: qk.adminPortfolio });
+      queryClient.invalidateQueries({ queryKey: qk.adminAlerts });
+      queryClient.invalidateQueries({ queryKey: qk.adminMerchants });
+    },
+    onError: (e) => toastError(e, t('tickError')),
+  });
+
+  const portfolio = portfolioQ.data;
+  const merchants = merchantsQ.data ?? [];
+  const alerts = alertsQ.data ?? [];
 
   return (
     <AppShell role="bank_admin" nav={nav}>
-      {() =>
-        loading || !portfolio ? (
-          <div className="flex min-h-[40vh] items-center justify-center">
-            <Spinner className="h-7 w-7" />
-          </div>
-        ) : (
+      {() => {
+        // Guard before building the tree: JSX children are evaluated eagerly,
+        // so `portfolio.contracts` would throw while the query is still in
+        // flight if this were expressed as a wrapper around the content.
+        if (!portfolio) {
+          return (
+            <QueryBoundary
+              isLoading={portfolioQ.isLoading}
+              isError={portfolioQ.isError}
+              onRetry={() => portfolioQ.refetch()}
+              skeleton={
+                <div className="flex flex-col gap-6">
+                  <Skeleton className="h-8 w-40" />
+                  <div className="grid gap-4 sm:grid-cols-4">
+                    <Skeleton className="h-24" />
+                    <Skeleton className="h-24" />
+                    <Skeleton className="h-24" />
+                    <Skeleton className="h-24" />
+                  </div>
+                  <Skeleton className="h-56 w-full" />
+                </div>
+              }
+            >
+              {null}
+            </QueryBoundary>
+          );
+        }
+
+        return (
           <div className="flex flex-col gap-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-col gap-1">
@@ -80,7 +98,11 @@ export default function AdminPage() {
                 {simDate ? (
                   <span className="text-meta text-muted-text">{t('simDate', { date: simDate })}</span>
                 ) : null}
-                <Button variant="secondary" loading={ticking} onClick={onTick}>
+                <Button
+                  variant="secondary"
+                  loading={tickM.isPending}
+                  onClick={() => tickM.mutate()}
+                >
                   <FastForward aria-hidden className="h-4 w-4" />
                   {t('advanceDay')}
                 </Button>
@@ -202,8 +224,8 @@ export default function AdminPage() {
               </div>
             </Card>
           </div>
-        )
-      }
+        );
+      }}
     </AppShell>
   );
 }

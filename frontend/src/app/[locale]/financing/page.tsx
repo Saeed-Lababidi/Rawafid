@@ -1,15 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CheckCircle2, ClipboardCheck, Sparkles } from 'lucide-react';
 import { AppShell } from '@/components/app/app-shell';
-import { Alert, Button, Card, Chip, RiskChip, Spinner } from '@/components/ui/primitives';
+import { Button, Card, Chip, RiskChip } from '@/components/ui/primitives';
+import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { ContributionBars, ScoreGauge } from '@/components/ui/charts';
 import { bandColor } from '@/components/ui/charts';
+import { useToast } from '@/components/providers/toast-provider';
 import {
   acceptOffer,
-  ApiError,
   generateOffer,
   getAssessment,
   getAssessments,
@@ -19,12 +20,10 @@ import {
   rejectOffer,
   runAssessment,
 } from '@/lib/api';
+import { POLL, qk } from '@/lib/query';
+import { outcomeOf } from '@/lib/decision';
 import { formatCurrency, formatDate, type Locale } from '@/lib/format';
-import type {
-  AssessmentDetailOut,
-  ContractDetailOut,
-  OfferOut,
-} from '@/lib/types';
+import type { AssessmentDetailOut, ContractDetailOut, OfferOut } from '@/lib/types';
 
 const NAV = [
   { href: '/dashboard', key: 'dashboard' },
@@ -40,112 +39,105 @@ export default function FinancingPage() {
   const locale = useLocale() as Locale;
   const nav = NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
 
-  const [assessment, setAssessment] = useState<AssessmentDetailOut | null>(null);
-  const [offer, setOffer] = useState<OfferOut | null>(null);
-  const [contract, setContract] = useState<ContractDetailOut | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { toast, toastError } = useToast();
 
-  const refreshContract = useCallback(async (id: string) => {
-    const c = await getContract(id);
-    setContract(c);
-  }, []);
+  const contractsQ = useQuery({ queryKey: qk.contracts, queryFn: getContracts });
+  const offersQ = useQuery({ queryKey: qk.offers, queryFn: getOffers });
+  const assessmentsQ = useQuery({ queryKey: qk.assessments, queryFn: getAssessments });
 
-  useEffect(() => {
-    let alive = true;
-    async function load() {
-      const [assessments, offers, contracts] = await Promise.all([
-        getAssessments(),
-        getOffers(),
-        getContracts(),
-      ]);
-      if (!alive) return;
-      const active = contracts.find((c) => c.status === 'active') ?? contracts[0];
-      if (active) {
-        setContract(await getContract(active.id));
-      }
-      const open = offers.find((o) => o.status === 'offered');
-      if (open) setOffer(open);
-      // Load the latest assessment's full detail only when there's no contract
-      // and no open offer yet — that's the only state that renders it.
-      if (!active && !open && assessments[0]) {
-        setAssessment(await getAssessment(assessments[0].id));
-      }
-      setLoading(false);
-    }
-    load().catch(() => setLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, []);
+  // Which of the four states this screen shows is derived from server data, not
+  // held in local state — so an accepted offer or a settled contract can never
+  // leave the UI showing a stale step.
+  const activeContractRow =
+    contractsQ.data?.find((c) => c.status === 'active') ?? contractsQ.data?.[0];
+  const openOffer = offersQ.data?.find((o) => o.status === 'offered');
+  const latestAssessmentId = assessmentsQ.data?.[0]?.id;
 
-  // Poll the live outstanding balance while a contract is active.
-  useEffect(() => {
-    if (!contract || contract.status !== 'active') return;
-    const id = setInterval(() => refreshContract(contract.id).catch(() => {}), 8000);
-    return () => clearInterval(id);
-  }, [contract, refreshContract]);
+  // Poll the live outstanding balance only while a contract is actually active;
+  // a repaid one is terminal and never changes again.
+  const contractQ = useQuery({
+    queryKey: qk.contract(activeContractRow?.id ?? ''),
+    queryFn: () => getContract(activeContractRow!.id),
+    enabled: Boolean(activeContractRow),
+    refetchInterval: activeContractRow?.status === 'active' ? POLL.live : false,
+  });
 
-  async function onRunAssessment() {
-    setBusy(true);
-    setError(null);
-    try {
-      setAssessment(await runAssessment());
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : t('error'));
-    }
-    setBusy(false);
-  }
+  // The full assessment detail is only rendered when there's no contract and no
+  // open offer — don't fetch it otherwise.
+  const needsAssessmentDetail =
+    Boolean(latestAssessmentId) && !activeContractRow && !openOffer;
+  const assessmentQ = useQuery({
+    queryKey: qk.assessment(latestAssessmentId ?? ''),
+    queryFn: () => getAssessment(latestAssessmentId!),
+    enabled: needsAssessmentDetail,
+  });
 
-  async function onGenerateOffer() {
-    setBusy(true);
-    setError(null);
-    try {
-      setOffer(await generateOffer());
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : t('error'));
-    }
-    setBusy(false);
-  }
+  const isLoading = contractsQ.isLoading || offersQ.isLoading || assessmentsQ.isLoading;
+  const isError = contractsQ.isError || offersQ.isError || assessmentsQ.isError;
+  const retry = () => {
+    contractsQ.refetch();
+    offersQ.refetch();
+    assessmentsQ.refetch();
+  };
 
-  async function onAccept() {
-    if (!offer) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const c = await acceptOffer(offer.id);
-      setContract(await getContract(c.id));
-      setOffer(null);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : t('error'));
-    }
-    setBusy(false);
-  }
+  const runAssessmentM = useMutation({
+    mutationFn: runAssessment,
+    onSuccess: (detail) => {
+      queryClient.setQueryData(qk.assessment(detail.id), detail);
+      queryClient.invalidateQueries({ queryKey: qk.assessments });
+    },
+    onError: (e) => toastError(e, t('error')),
+  });
 
-  async function onReject() {
-    if (!offer) return;
-    setBusy(true);
-    try {
-      await rejectOffer(offer.id);
-      setOffer(null);
-    } catch {
-      /* ignore */
-    }
-    setBusy(false);
-  }
+  const generateOfferM = useMutation({
+    mutationFn: generateOffer,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.offers }),
+    onError: (e) => toastError(e, t('error')),
+  });
+
+  const acceptOfferM = useMutation({
+    mutationFn: (id: string) => acceptOffer(id),
+    onSuccess: () => {
+      toast(t('acceptedToast'), 'success');
+      queryClient.invalidateQueries({ queryKey: qk.offers });
+      queryClient.invalidateQueries({ queryKey: qk.contracts });
+    },
+    onError: (e) => toastError(e, t('error')),
+  });
+
+  const rejectOfferM = useMutation({
+    mutationFn: (id: string) => rejectOffer(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.offers }),
+    onError: (e) => toastError(e, t('error')),
+  });
+
+  const contract = contractQ.data;
+  const offer = openOffer;
+  const assessment = needsAssessmentDetail ? assessmentQ.data : undefined;
+  const busy =
+    runAssessmentM.isPending ||
+    generateOfferM.isPending ||
+    acceptOfferM.isPending ||
+    rejectOfferM.isPending;
 
   return (
     <AppShell role="merchant" nav={nav}>
-      {() =>
-        loading ? (
-          <div className="flex min-h-[40vh] items-center justify-center">
-            <Spinner className="h-7 w-7" />
-          </div>
-        ) : (
+      {() => (
+        <QueryBoundary
+          isLoading={isLoading}
+          isError={isError}
+          onRetry={retry}
+          skeleton={
+            <div className="flex flex-col gap-6">
+              <Skeleton className="h-8 w-40" />
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          }
+        >
           <div className="flex flex-col gap-6">
             <h1 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">{t('title')}</h1>
-            {error ? <Alert>{error}</Alert> : null}
 
             {/* ---- Active contract view ---- */}
             {contract ? (
@@ -155,8 +147,8 @@ export default function FinancingPage() {
               <OfferView
                 offer={offer}
                 busy={busy}
-                onAccept={onAccept}
-                onReject={onReject}
+                onAccept={() => acceptOfferM.mutate(offer.id)}
+                onReject={() => rejectOfferM.mutate(offer.id)}
                 locale={locale}
               />
             ) : assessment ? (
@@ -164,7 +156,7 @@ export default function FinancingPage() {
               <AssessmentView
                 assessment={assessment}
                 busy={busy}
-                onGenerateOffer={onGenerateOffer}
+                onGenerateOffer={() => generateOfferM.mutate()}
                 locale={locale}
               />
             ) : (
@@ -179,14 +171,14 @@ export default function FinancingPage() {
                   </h2>
                   <p className="text-body text-body-text-muted">{t('introBody')}</p>
                 </div>
-                <Button loading={busy} onClick={onRunAssessment}>
+                <Button loading={busy} onClick={() => runAssessmentM.mutate()}>
                   {t('runAssessment')}
                 </Button>
               </Card>
             )}
           </div>
-        )
-      }
+        </QueryBoundary>
+      )}
     </AppShell>
   );
 
@@ -349,6 +341,10 @@ function AssessmentView({
 }) {
   const t = useTranslations('financing');
   const { decision } = assessment;
+  // The engine decides approve / review / decline; `decision.approved` folds
+  // `review` into false, which would tell a reviewable merchant they were
+  // rejected. Read the engine's real verdict instead.
+  const outcome = outcomeOf(decision);
   const contributions = Object.entries(decision.feature_contributions)
     .map(([label, value]) => ({ label, value }))
     .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
@@ -361,12 +357,17 @@ function AssessmentView({
             <span className="text-meta text-body-text-muted">{t('yourScore')}</span>
             <RiskChip band={assessment.risk_band} />
           </div>
-          {decision.approved ? (
+          {outcome === 'approve' ? (
             <div className="flex items-center gap-2 text-risk-a">
               <CheckCircle2 aria-hidden className="h-5 w-5" />
               <span className="text-body font-bold">
                 {t('approvedUpTo', { amount: formatCurrency(decision.max_advance_amount, locale) })}
               </span>
+            </div>
+          ) : outcome === 'review' ? (
+            <div className="flex items-center gap-2 text-chip-warn-text">
+              <ClipboardCheck aria-hidden className="h-5 w-5" />
+              <span className="text-body font-bold">{t('underReview')}</span>
             </div>
           ) : (
             <span className="text-body font-bold text-risk-d">{t('declined')}</span>
@@ -374,6 +375,12 @@ function AssessmentView({
         </div>
         <ScoreGauge score={assessment.score} colorVar={bandColor(assessment.risk_band)} />
       </Card>
+
+      {outcome === 'review' ? (
+        <Card className="border-chip-warn-border bg-chip-warn-bg">
+          <p className="text-body text-chip-warn-text">{t('underReviewBody')}</p>
+        </Card>
+      ) : null}
 
       <Card className="flex flex-col gap-3">
         <h2 className="text-body font-bold text-body-text">{t('whyTitle')}</h2>
@@ -392,7 +399,7 @@ function AssessmentView({
         <ContributionBars items={contributions} />
       </Card>
 
-      {decision.approved ? (
+      {outcome === 'approve' ? (
         <Button loading={busy} onClick={onGenerateOffer} className="self-start">
           {t('generateOffer')}
         </Button>

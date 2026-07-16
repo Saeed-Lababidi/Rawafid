@@ -103,6 +103,16 @@ export interface ScoringFeatures {
   account_age_days: number;
   platform_mix: Record<string, number>;
 }
+// The engine's real verdict is three-way (rafid-engine `Outcome`); the
+// backend's `approved` boolean flattens `review` into `false`. Stage 1 renders
+// the full engine Decision — this minimal shape is what Stage 0 needs to stop
+// mislabelling a reviewable merchant as declined.
+export type EngineOutcome = 'approve' | 'review' | 'decline';
+
+export interface EngineDecisionPartial {
+  funding_recommendation?: { decision?: EngineOutcome };
+}
+
 export interface CreditDecision {
   score: number;
   risk_band: RiskBand;
@@ -112,6 +122,10 @@ export interface CreditDecision {
   reasons: string[];
   feature_contributions: Record<string, number>;
   model_version: string;
+  // Full rafid-engine Decision, persisted verbatim. Present only when the
+  // backend runs SCORING_BACKEND=module (it does in production); the stub and
+  // http models leave it null. Typed in full in Stage 1.
+  engine_decision?: EngineDecisionPartial | null;
 }
 export interface AssessmentOut {
   id: string;
