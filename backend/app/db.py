@@ -15,7 +15,11 @@ def _engine_kwargs(url: str) -> dict:
     if url.startswith("sqlite"):
         # In-memory SQLite (tests) needs a single shared connection.
         return {"connect_args": {"check_same_thread": False}, "poolclass": StaticPool}
-    return {"pool_pre_ping": True}
+    # Neon (and most managed Postgres) require TLS; asyncpg's connect() takes
+    # `ssl`, not the `sslmode` query param Neon's connection string uses —
+    # strip sslmode/channel_binding from DATABASE_URL at the env-var level and
+    # supply ssl=require here instead.
+    return {"pool_pre_ping": True, "connect_args": {"ssl": "require"}}
 
 
 _settings = get_settings()

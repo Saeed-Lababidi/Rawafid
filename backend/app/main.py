@@ -45,10 +45,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# frontend teammate consumes /openapi.json; allow local dev origins broadly
+# Production Vercel origin only, plus a scoped *.vercel.app regex so preview
+# deployments (D-03: push-to-main auto-deploys, previews tested pre-merge) can
+# still reach the backend during the sprint. The previous allow_origins=["*"]
+# is gone (T-01-01) — narrow, not broad, is the deploy-time default now.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://rawafid-amad.vercel.app"],
+    allow_origin_regex=r"https://.*\.vercel\.app$",
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
