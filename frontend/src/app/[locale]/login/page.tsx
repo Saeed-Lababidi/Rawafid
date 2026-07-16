@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { ApiError, login, roleFromToken, setTokens } from '@/lib/api';
 import { Alert, Button, Card } from '@/components/ui/primitives';
 
@@ -91,6 +91,13 @@ export default function LoginPage() {
             {t('signIn')}
           </Button>
         </form>
+
+        <p className="text-center text-meta text-body-text-muted">
+          {t('noAccount')}{' '}
+          <Link href="/register" className="font-bold text-accent hover:underline">
+            {t('createAccount')}
+          </Link>
+        </p>
       </Card>
 
       <div className="flex flex-col gap-3">

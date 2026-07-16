@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useQueries } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, TrendingUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, PlugZap, TrendingUp } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { AppShell } from '@/components/app/app-shell';
 import { Card, Chip, StatTile } from '@/components/ui/primitives';
@@ -12,6 +12,7 @@ import {
   aggregate,
   getAlerts,
   getAssessments,
+  getConnections,
   getContracts,
   getMerchant,
   getSales,
@@ -24,6 +25,7 @@ import type { SalesOrderOut } from '@/lib/types';
 const MERCHANT_NAV = [
   { href: '/dashboard', key: 'dashboard' },
   { href: '/financing', key: 'financing' },
+  { href: '/settings', key: 'settings' },
 ];
 
 // Group completed sales into a daily-revenue series for the area chart.
@@ -50,26 +52,42 @@ export default function DashboardPage() {
   // zero new rows and the current held-receivables total (FRONTEND_GUIDE §6.3),
   // which is the hero number here. Settlements/contracts poll because the
   // monitoring agent moves them on its own.
-  const [merchantQ, aggregateQ, salesQ, settlementsQ, contractsQ, assessmentsQ, alertsQ] =
-    useQueries({
-      queries: [
-        { queryKey: qk.merchant, queryFn: getMerchant },
-        { queryKey: qk.aggregate, queryFn: aggregate },
-        { queryKey: qk.sales(5000), queryFn: () => getSales(5000) },
-        { queryKey: qk.settlements, queryFn: getSettlements, refetchInterval: POLL.ambient },
-        { queryKey: qk.contracts, queryFn: getContracts, refetchInterval: POLL.ambient },
-        { queryKey: qk.assessments, queryFn: getAssessments },
-        { queryKey: qk.alerts, queryFn: getAlerts, refetchInterval: POLL.ambient },
-      ],
-    });
+  const [
+    merchantQ,
+    aggregateQ,
+    salesQ,
+    settlementsQ,
+    contractsQ,
+    assessmentsQ,
+    alertsQ,
+    connectionsQ,
+  ] = useQueries({
+    queries: [
+      { queryKey: qk.merchant, queryFn: getMerchant },
+      { queryKey: qk.aggregate, queryFn: aggregate },
+      { queryKey: qk.sales(5000), queryFn: () => getSales(5000) },
+      { queryKey: qk.settlements, queryFn: getSettlements, refetchInterval: POLL.ambient },
+      { queryKey: qk.contracts, queryFn: getContracts, refetchInterval: POLL.ambient },
+      { queryKey: qk.assessments, queryFn: getAssessments },
+      { queryKey: qk.alerts, queryFn: getAlerts, refetchInterval: POLL.ambient },
+      { queryKey: qk.connections, queryFn: getConnections },
+    ],
+  });
 
-  const isLoading = merchantQ.isLoading || aggregateQ.isLoading || salesQ.isLoading;
+  const isLoading =
+    merchantQ.isLoading || aggregateQ.isLoading || salesQ.isLoading || connectionsQ.isLoading;
   const isError = merchantQ.isError || aggregateQ.isError;
   const retry = () => {
     merchantQ.refetch();
     aggregateQ.refetch();
     salesQ.refetch();
+    connectionsQ.refetch();
   };
+
+  // A merchant who registered but never finished onboarding has no active
+  // source. Everything below (receivables, revenue, settlements) would render
+  // as zeroes and read like a broken dashboard rather than an unfinished setup.
+  const hasActiveConnection = (connectionsQ.data ?? []).some((c) => c.status === 'active');
 
   const merchant = merchantQ.data;
   const held = aggregateQ.data?.held_receivables_total ?? null;
@@ -107,6 +125,28 @@ export default function DashboardPage() {
               </h1>
             </div>
 
+            {!hasActiveConnection ? (
+              <Card className="flex flex-col items-center gap-5 py-12 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-accent/10">
+                  <PlugZap aria-hidden className="h-8 w-8 text-accent" />
+                </div>
+                <div className="flex max-w-md flex-col gap-2">
+                  <h2 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">
+                    {t('onboardTitle')}
+                  </h2>
+                  <p className="text-body text-body-text-muted">{t('onboardBody')}</p>
+                </div>
+                <Link
+                  href="/connect"
+                  locale={locale}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-pill bg-accent px-6 text-body font-bold text-accent-foreground transition-opacity hover:opacity-90"
+                >
+                  {t('onboardCta')}
+                  <Arrow aria-hidden className="h-4 w-4" />
+                </Link>
+              </Card>
+            ) : (
+              <>
             {/* Hero: held receivables + financing CTA */}
             <Card className="flex flex-col gap-5 border-accent/30 bg-gradient-to-br from-accent/10 to-transparent sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-col gap-1.5">
@@ -209,6 +249,8 @@ export default function DashboardPage() {
                 </div>
               </Card>
             </div>
+              </>
+            )}
           </div>
         </QueryBoundary>
       )}

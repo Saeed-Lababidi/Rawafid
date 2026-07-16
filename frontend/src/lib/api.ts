@@ -202,7 +202,15 @@ export const me = () => api<UserOut>('/auth/me');
 
 // ---- merchant ----
 export const getMerchant = () => api<import('./types').MerchantOut>('/merchants/me');
+/** Mirrors app/schemas/auth.py MerchantUpdate — every field optional. */
+export const updateMerchant = (body: {
+  name?: string;
+  business_type?: string;
+  city?: string;
+}) => api<import('./types').MerchantOut>('/merchants/me', { method: 'PATCH', body });
 export const getConnections = () => api<ConnectionOut[]>('/connections');
+export const revokeConnection = (id: string) =>
+  api<ConnectionOut>(`/connections/${id}/revoke`, { method: 'POST' });
 export const startConsent = (kind: 'bank' | 'sales', institution: string) =>
   api<ConsentStartResponse>(`/connections/${kind}/consent/start`, {
     method: 'POST',

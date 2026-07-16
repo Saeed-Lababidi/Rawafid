@@ -38,6 +38,7 @@ import type { AssessmentDetailOut, ContractDetailOut, OfferOut } from '@/lib/typ
 const NAV = [
   { href: '/dashboard', key: 'dashboard' },
   { href: '/financing', key: 'financing' },
+  { href: '/settings', key: 'settings' },
 ];
 
 const SCHEDULE_TONE = { paid: 'good', partial: 'warn', pending: 'neutral' } as const;
