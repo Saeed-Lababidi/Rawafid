@@ -47,7 +47,15 @@ def build_repayment_schedule(
     upcoming: list[tuple[date, float]],
     max_cycles: int = 26,
 ) -> tuple[list[Deduction], date | None]:
-    """Allocate ``total_repayment`` across settlements at <= 40% each."""
+    """Allocate ``total_repayment`` across settlements at <= 40% each.
+
+    If sparse/near-zero settlement data means the 40%-per-cycle cap can't fully
+    recover the balance within ``max_cycles`` projected cycles, the shortfall is
+    folded into the final installment rather than silently dropped — the
+    schedule always sums to ``total_repayment`` exactly, even if that means the
+    last installment exceeds the normal 40% cap. That trade-off (a single
+    oversized final deduction) is preferable to quietly under-collecting.
+    """
     if total_repayment <= 0 or not upcoming:
         return [], None
 
@@ -81,6 +89,15 @@ def build_repayment_schedule(
             )
             remaining = round(remaining - deduction, 2)
             cycles += 1
+
+        # Sparse/near-zero settlements can exhaust max_cycles without fully
+        # allocating the balance. Rather than silently under-collecting, fold
+        # the shortfall into the last installment so the sum always matches.
+        if remaining > 0 and schedule:
+            schedule[-1] = schedule[-1].model_copy(
+                update={"deduction": round(schedule[-1].deduction + remaining, 2)}
+            )
+            remaining = 0.0
 
     payoff = schedule[-1].date if schedule else None
     return schedule, payoff
