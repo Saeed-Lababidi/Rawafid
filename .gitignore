@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# GSD tooling — intentionally not committed. Recreate locally with:
+#   npx -y @opengsd/gsd-core@latest --claude --local
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
