@@ -19,6 +19,11 @@ from .schema import (
 )
 from .scoring import clamp
 
+# Built once and reused: the default registry is stateless (each Factor's
+# score_fn is a pure function), so rebuilding it on every run_scorecard() call
+# was pure waste. Callers can still pass a custom registry to bypass the cache.
+_DEFAULT_REGISTRY = build_default_registry()
+
 
 @dataclass
 class ScorecardResult:
@@ -71,7 +76,7 @@ def _health(normalized: float) -> tuple[HealthStatus, Localized]:
 def run_scorecard(
     features: MerchantFeatures, registry: FactorRegistry | None = None
 ) -> ScorecardResult:
-    reg = registry or build_default_registry()
+    reg = registry or _DEFAULT_REGISTRY
 
     graded: list[tuple] = []
     normalized = 0.0
