@@ -50,10 +50,14 @@ def assess_confidence(features: MerchantFeatures) -> ConfidenceResult:
         features.merchant.tenure_months / C.target_tenure_months
     )
 
-    # 3) source coverage — bank + sales + settlements present?
+    # 3) source coverage — bank + sales + settlements all connected?
+    # Explicit checks, not string-sniffing: a source counts as "sales" only if it
+    # names a known sales platform (or by_platform data is already present),
+    # so an unrelated connected source (e.g. a settlements provider) can't be
+    # miscounted as sales coverage.
     sources = {s.lower() for s in meta.sources_connected}
     has_bank = any("bank" in s for s in sources)
-    has_sales = bool(features.sales.by_platform) or any("bank" not in s for s in sources)
+    has_sales = bool(features.sales.by_platform) or bool(sources & config.KNOWN_SALES_PLATFORMS)
     has_settlements = (
         features.settlements.confirmed_receivables > 0 or bool(features.settlements.upcoming)
     )
