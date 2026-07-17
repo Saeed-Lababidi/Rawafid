@@ -9,9 +9,11 @@ import { AppShell } from '@/components/app/app-shell';
 import { Button, Card, Chip } from '@/components/ui/primitives';
 import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { useToast } from '@/components/providers/toast-provider';
-import { getConnections, getMerchant, revokeConnection, updateMerchant } from '@/lib/api';
+import { getConnections, getMerchant, getSales, revokeConnection, updateMerchant } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { MERCHANT_NAV } from '@/lib/nav';
+import { tierFor } from '@/lib/tiers';
+import { PlanCard } from '@/components/app/plan-card';
 import type { ConnectionOut } from '@/lib/types';
 
 const BUSINESS_TYPES = ['ecommerce', 'food', 'other'] as const;
@@ -28,6 +30,8 @@ export default function SettingsPage() {
 
   const merchantQ = useQuery({ queryKey: qk.merchant, queryFn: getMerchant });
   const connectionsQ = useQuery({ queryKey: qk.connections, queryFn: getConnections });
+  // Billing tracks order volume, so the plan is read off the sales feed.
+  const salesQ = useQuery({ queryKey: qk.sales(5000), queryFn: () => getSales(5000) });
 
   const [name, setName] = useState('');
   const [businessType, setBusinessType] = useState('ecommerce');
@@ -98,6 +102,8 @@ export default function SettingsPage() {
             <h1 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">
               {t('title')}
             </h1>
+
+            {salesQ.data ? <PlanCard usage={tierFor(salesQ.data)} /> : null}
 
             {/* Profile */}
             <Card className="flex flex-col gap-4">

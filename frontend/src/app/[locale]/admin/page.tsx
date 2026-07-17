@@ -124,8 +124,9 @@ export default function AdminPage() {
                 value={formatCurrency(portfolio.contracts.outstanding_total, locale)}
               />
               <StatTile
-                label={t('expectedRevenue')}
+                label={t('expectedReturn')}
                 value={formatCurrency(portfolio.contracts.expected_revenue, locale)}
+                hint={t('expectedReturnHint')}
                 accent
               />
             </div>

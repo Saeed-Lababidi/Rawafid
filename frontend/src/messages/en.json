@@ -499,7 +499,6 @@
     "activeContracts": "Active contracts",
     "disbursed": "Total disbursed",
     "outstanding": "Total outstanding",
-    "expectedRevenue": "Expected revenue",
     "funnelTitle": "Origination funnel",
     "funnel": {
       "registered": "Registered",
@@ -515,7 +514,9 @@
     "noAlerts": "No open alerts.",
     "merchantsTitle": "Merchants",
     "verified": "Verified",
-    "merchantsHint": "Open any merchant to see the full underwriting file."
+    "merchantsHint": "Open any merchant to see the full underwriting file.",
+    "expectedReturn": "Bank's expected return",
+    "expectedReturnHint": "Alinma's disclosed Murabaha profit and fees across the financing book. This is the bank's return, not Rafid's revenue."
   },
   "sales": {
     "title": "Sales",
@@ -608,5 +609,14 @@
       "repaid": "Repaid",
       "defaulted": "Defaulted"
     }
+  },
+  "plan": {
+    "title": "Your Rafid plan",
+    "hint": "Your tier tracks how many orders we process for you.",
+    "ordersPerMonth": "{count} orders / month",
+    "ofLimit": "of {limit} included in this tier",
+    "unlimited": "Unlimited orders on this tier",
+    "nextTier": "Past this, you move to {tier}",
+    "shariaNote": "Rafid charges for the work of processing your sales, never a share of your financing. Pricing on financing volume would be bay' al-dayn, so we don't do it."
   }
 }
