@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* Class-based dark mode keyed off the `.dark` class next-themes toggles on
-   <html> (server-resolved from the theme cookie, D-11/FOUND-02) — Tailwind v4
+   <html> (server-resolved from the theme cookie, D-11/FOUND-02) - Tailwind v4
    defaults `dark:` to prefers-color-scheme, this opts into the selector
    strategy instead. */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -13,7 +13,7 @@
   --color-brand-purple: #8980bc;
   --color-brand-cream: #f6e7dc;
 
-  /* Semantic surface layer (D-09) — light defaults here, dark reassigned
+  /* Semantic surface layer (D-09) - light defaults here, dark reassigned
      under .dark below so every bg/text/border utility using these tokens
      flips for free */
   --color-page-bg: #f7f2ec;
@@ -25,18 +25,18 @@
   --color-body-text: #4a4238;
   --color-body-text-muted: #6b6156;
 
-  /* Accent — reserved for CTA fill, active toggle state, link underline,
+  /* Accent - reserved for CTA fill, active toggle state, link underline,
      brand-mark stroke only (UI-SPEC "Accent reserved for") */
   --color-accent: #c36b4e;
   --color-accent-foreground: #ffffff;
 
-  /* Raw risk-band swatches (score gauges / status dots — not chips) */
+  /* Raw risk-band swatches (score gauges / status dots - not chips) */
   --color-risk-a: #2f6140;
   --color-risk-b: #2f6140;
   --color-risk-c: #c36b4e;
   --color-risk-d: #d0402e;
 
-  /* Risk-band chip triples — one chip anatomy reused across risk + alert
+  /* Risk-band chip triples - one chip anatomy reused across risk + alert
      severity scales (D-12). Alert medium/high reuse the warn/destructive
      triples per UI-SPEC; alert low gets its own info/purple triple. */
   --color-chip-good-bg: #eaf2ea;
@@ -60,7 +60,7 @@
   --radius-tile: 12px;
   --radius-pill: 999px;
 
-  /* Phase-1 Active Type Set — 4 sizes / 2 weights, hard cap (UI-SPEC Typography) */
+  /* Phase-1 Active Type Set - 4 sizes / 2 weights, hard cap (UI-SPEC Typography) */
   --text-meta: 12px;
   --text-meta--line-height: 1.4;
   --text-body: 14px;
@@ -70,17 +70,27 @@
   --text-display: 40px;
   --text-display--line-height: 1.15;
 
-  /* Reserved tokens — declared now, first rendered Phase 3+ (do not remove) */
+  /* Reserved tokens - declared now, first rendered Phase 3+ (do not remove) */
   --text-card-heading: 17px;
   --text-card-heading--line-height: 1.3;
   --font-weight-chip: 500;
 
-  /* IBM Plex Sans Arabic — CSS variable supplied by next/font in
+  /* IBM Plex Sans Arabic - CSS variable supplied by next/font in
      [locale]/layout.tsx; ui-sans-serif/system-ui are the fallback stack */
   --font-sans: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand-system display + figure faces. Both chain back to Plex Arabic so
+     Arabic glyphs render in a real Arabic face while Latin text picks up the
+     distinctive Space Grotesk / Space Mono look (see layout.tsx). */
+  --font-display: var(--font-space-grotesk), var(--font-plex-arabic), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-space-mono), var(--font-plex-arabic), ui-monospace, monospace;
+
+  /* Fixed brand hexes for illustration plates that must stay light in both
+     themes (thesis diagram, flow atmospheres) - deliberately not theme-swapped. */
+  --color-plate-cream: #fff7ef;
 }
 
-/* Dark theme overrides (D-10) — deep-navy surfaces, cream-tinted text,
+/* Dark theme overrides (D-10) - deep-navy surfaces, cream-tinted text,
    terra/purple accents lightened for WCAG AA on navy. */
 .dark {
   --color-page-bg: #081c30;
@@ -121,4 +131,105 @@
 body {
   background-color: var(--color-page-bg);
   color: var(--color-body-text);
+}
+
+/* ============================================================
+   Arabic locale: pin the display + figure faces to IBM Plex Sans
+   Arabic. Space Grotesk / Space Mono are Latin-only and have no
+   business shaping Arabic - matches the prototype (index.html),
+   where every glyph is Plex Arabic. Latin numerals inside Arabic
+   still render cleanly from Plex Arabic.
+   ============================================================ */
+html[lang='ar'] {
+  --font-display: var(--font-plex-arabic), sans-serif;
+  --font-mono: var(--font-plex-arabic), sans-serif;
+}
+
+/* Smooth in-page navigation (brand-system.html). Section anchors clear
+   the fixed hero-nav via scroll-margin. */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================================
+   Scroll-reveal choreography (anime.js drives the transforms;
+   these only set the pre-animation resting state). Elements are
+   hidden only once the JS controller has flagged the document
+   ready, so a no-JS / pre-hydration paint still shows everything.
+   ============================================================ */
+html.anim-ready [data-reveal] {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  html.anim-ready [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Sticky landing mini-nav: parked above the fold, slides in past the hero. */
+[data-stickynav] {
+  transform: translateY(-100%);
+  opacity: 0;
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+[data-stickynav].is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* In-page nav tabs: quiet by default, current section lit in the current. */
+[data-navlink] {
+  position: relative;
+  transition: color 0.2s ease;
+}
+[data-navlink].is-active {
+  color: var(--color-brand-terra);
+}
+[data-navlink].is-active::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-brand-terra);
+}
+
+/* ============================================================
+   Brand-system flow lines - drifting tributaries used behind
+   dark hero/CTA/auth atmospheres (brand-system.html .flow-line).
+   ============================================================ */
+@keyframes rafid-drift {
+  to {
+    stroke-dashoffset: -266;
+  }
+}
+
+.flow-line {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.5;
+  stroke-dasharray: 6 260;
+  animation: rafid-drift 9s linear infinite;
+}
+
+/* Direction-aware decorative strokes (solution diagram converge/diverge). */
+[dir='rtl'] [data-mirror] {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-line {
+    animation: none;
+    opacity: 0.35;
+  }
 }

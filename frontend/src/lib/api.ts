@@ -1,7 +1,7 @@
 // Typed client for the Rafid backend. Token pair lives in localStorage; every
 // authed call attaches the access token and transparently retries once through
 // /auth/refresh on a 401 (FRONTEND_GUIDE §3). The host is read ONLY from
-// NEXT_PUBLIC_API_URL — no host string is hardcoded (D-04).
+// NEXT_PUBLIC_API_URL - no host string is hardcoded (D-04).
 'use client';
 
 import type {
@@ -48,7 +48,7 @@ export function clearTokens(): void {
 }
 
 // Decode the `role` claim client-side so we can route to the right surface
-// without an extra round-trip. Never trusted for authorization — the backend
+// without an extra round-trip. Never trusted for authorization - the backend
 // re-derives identity from the token on every call.
 export function roleFromToken(token: string | null): Role | null {
   if (!token) return null;
