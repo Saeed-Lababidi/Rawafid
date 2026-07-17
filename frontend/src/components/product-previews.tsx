@@ -18,7 +18,7 @@ function MonoFig({ children }: { children: string }) {
   return <bdi className="font-mono">{text}</bdi>;
 }
 
-/* 1) Merchant dashboard — held-receivables FinCard + revenue sparkline + KPIs */
+/* 1) Merchant dashboard - held-receivables FinCard + revenue sparkline + KPIs */
 export function DashboardPreview() {
   const bars = [38, 52, 45, 63, 58, 72, 66, 81, 74, 88, 79, 94];
   return (
@@ -63,7 +63,7 @@ export function DashboardPreview() {
   );
 }
 
-/* 2) Financing — contract FinCard with repayment progress + schedule rows */
+/* 2) Financing - contract FinCard with repayment progress + schedule rows */
 export function FinancingPreview() {
   const rows = [
     ['good', 100],
@@ -109,7 +109,7 @@ export function FinancingPreview() {
   );
 }
 
-/* 3) Explainable score — gauge + signed contribution bars + reasons */
+/* 3) Explainable score - gauge + signed contribution bars + reasons */
 export function EnginePreview() {
   const C = 2 * Math.PI * 34;
   const contrib = [0.9, 0.6, -0.35, 0.45, -0.2];
@@ -157,7 +157,7 @@ export function EnginePreview() {
   );
 }
 
-/* 4) Bank portfolio — KPI tiles + funnel bars + risk donut */
+/* 4) Bank portfolio - KPI tiles + funnel bars + risk donut */
 export function BankPreview() {
   const funnel = [100, 82, 61, 44, 33];
   const donut = [
