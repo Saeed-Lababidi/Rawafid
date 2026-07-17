@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { IBM_Plex_Sans_Arabic } from 'next/font/google';
+import { IBM_Plex_Sans_Arabic, Space_Grotesk, Space_Mono } from 'next/font/google';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
@@ -10,14 +10,36 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import './globals.css';
 
-// FOUND-04: only 400/700 render in Phase 1 (weight 500 is a reserved token,
-// see globals.css --font-weight-chip). Arabic subset is mandatory — omitting
-// it silently drops Arabic glyph coverage (RESEARCH Pitfall 2).
+// Arabic subset is mandatory - omitting it silently drops Arabic glyph
+// coverage (RESEARCH Pitfall 2). 500 now renders (chip weight, brand-system).
 const plexArabic = IBM_Plex_Sans_Arabic({
   subsets: ['arabic', 'latin'],
-  weight: ['400', '700'],
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-plex-arabic',
+});
+
+// Brand-system display + figure fonts. Latin-only by nature.
+// adjustFontFallback:false is CRITICAL - next/font otherwise synthesises an
+// Arial-based metric fallback, and Arial *has* Arabic glyphs, so Arabic text
+// flowing through the --font-display / --font-mono chain would render in
+// size-adjusted Arial instead of IBM Plex Sans Arabic (the "wrong Arabic font"
+// bug). With it off, missing Arabic glyphs fall straight through to Plex Arabic,
+// and in ar locale globals.css pins these tokens to Plex Arabic outright.
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  adjustFontFallback: false,
+  variable: '--font-space-grotesk',
+});
+
+const spaceMono = Space_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
+  adjustFontFallback: false,
+  variable: '--font-space-mono',
 });
 
 export const metadata: Metadata = {
@@ -38,7 +60,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   // Server-resolved, flash-free theme (D-11/FOUND-02): the `theme` cookie
   // (written by ThemeToggle) is read here so the very first SSR paint
-  // already carries the correct class — no client-side flash/hop.
+  // already carries the correct class - no client-side flash/hop.
   const cookieStore = await cookies();
   const theme = cookieStore.get('theme')?.value === 'dark' ? 'dark' : 'light';
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
@@ -48,7 +70,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html
       lang={locale}
       dir={dir}
-      className={`${plexArabic.variable} ${theme}`}
+      className={`${plexArabic.variable} ${spaceGrotesk.variable} ${spaceMono.variable} ${theme}`}
       suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col bg-page-bg font-sans text-body-text antialiased">

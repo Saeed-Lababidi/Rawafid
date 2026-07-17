@@ -25,7 +25,7 @@ export function ThemeToggle() {
   const t = useTranslations('nav');
   // Avoid a hydration mismatch: `theme` is undefined on the server/first
   // client render (next-themes only knows it after mount). The <html> class
-  // is already correct from the server-resolved cookie (D-11/FOUND-02) — we
+  // is already correct from the server-resolved cookie (D-11/FOUND-02) - we
   // only need `mounted` to safely read `theme` for the icon/label.
   const mounted = useHasMounted();
 
@@ -35,7 +35,7 @@ export function ThemeToggle() {
     const next = isDark ? 'light' : 'dark';
     setTheme(next);
     // Mirror the choice into a cookie so the *next* request's server render
-    // already resolves to `next` — next-themes only persists to localStorage.
+    // already resolves to `next` - next-themes only persists to localStorage.
     document.cookie = `theme=${next}; path=/; max-age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax`;
   };
 

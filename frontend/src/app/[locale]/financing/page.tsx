@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { AppShell } from '@/components/app/app-shell';
-import { Alert, Button, Card, Chip, RiskChip, Spinner } from '@/components/ui/primitives';
+import { Alert, Button, Card, CardHeading, Chip, RiskChip, Spinner } from '@/components/ui/primitives';
+import { FinCard } from '@/components/brand';
+import { IconGrowth, IconInvoice, IconSharia } from '@/components/brand-icons';
 import { ContributionBars, ScoreGauge } from '@/components/ui/charts';
 import { bandColor } from '@/components/ui/charts';
 import {
@@ -68,7 +70,7 @@ export default function FinancingPage() {
       const open = offers.find((o) => o.status === 'offered');
       if (open) setOffer(open);
       // Load the latest assessment's full detail only when there's no contract
-      // and no open offer yet — that's the only state that renders it.
+      // and no open offer yet - that's the only state that renders it.
       if (!active && !open && assessments[0]) {
         setAssessment(await getAssessment(assessments[0].id));
       }
@@ -170,11 +172,11 @@ export default function FinancingPage() {
             ) : (
               /* ---- Intro / run assessment ---- */
               <Card className="flex flex-col items-center gap-5 py-12 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-accent/10">
-                  <Sparkles aria-hidden className="h-8 w-8 text-accent" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-accent/10 text-accent">
+                  <IconGrowth className="h-8 w-8" />
                 </div>
                 <div className="flex max-w-md flex-col gap-2">
-                  <h2 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">
+                  <h2 className="font-display text-h1 font-bold text-brand-navy dark:text-brand-cream">
                     {t('introTitle')}
                   </h2>
                   <p className="text-body text-body-text-muted">{t('introBody')}</p>
@@ -195,49 +197,35 @@ export default function FinancingPage() {
     const repaid = contract.status === 'repaid';
     return (
       <div className="flex flex-col gap-6">
-        <Card className="flex flex-col gap-5 border-accent/30 bg-gradient-to-br from-accent/10 to-transparent">
-          <div className="flex items-center justify-between">
-            <span className="text-meta text-body-text-muted">{t('outstanding')}</span>
-            <Chip tone={repaid ? 'good' : 'info'}>
-              {repaid ? t('statusRepaid') : t('statusActive')}
-            </Chip>
-          </div>
-          <span className="text-display font-bold text-accent">
-            <bdi>{formatCurrency(contract.outstanding, locale)}</bdi>
-          </span>
-          <div className="flex flex-col gap-2">
-            <div className="h-2.5 w-full overflow-hidden rounded-pill bg-hairline-strong">
-              <div
-                className="h-full rounded-pill bg-accent transition-[width] duration-700"
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
+        <FinCard
+          badge={repaid ? t('statusRepaid') : t('statusActive')}
+          amount={formatCurrency(contract.outstanding, locale)}
+          amountCaption={t('outstanding')}
+          rows={[
+            { label: t('costPrice'), value: formatCurrency(contract.cost_price, locale) },
+            { label: t('profit'), value: formatCurrency(contract.profit_amount, locale) },
+            { label: t('totalDue'), value: formatCurrency(contract.total_due, locale) },
+          ]}
+          footer={
+            <div className="flex flex-col gap-2">
+              <div className="h-2.5 w-full overflow-hidden rounded-pill bg-white/12">
+                <div
+                  className="h-full rounded-pill bg-brand-terra transition-[width] duration-700"
+                  style={{ width: `${Math.round(progress * 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between font-mono text-[11px] text-brand-cream/60">
+                <span>{t('repaidOf', { total: formatCurrency(contract.total_due, locale) })}</span>
+                <span>
+                  <bdi>{Math.round(progress * 100)}%</bdi>
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between text-meta text-muted-text">
-              <span>{t('repaidOf', { total: formatCurrency(contract.total_due, locale) })}</span>
-              <span>
-                <bdi>{Math.round(progress * 100)}%</bdi>
-              </span>
-            </div>
-          </div>
-        </Card>
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Card className="flex flex-col gap-1">
-            <span className="text-meta text-muted-text">{t('costPrice')}</span>
-            <span className="text-body font-bold text-body-text"><bdi>{formatCurrency(contract.cost_price, locale)}</bdi></span>
-          </Card>
-          <Card className="flex flex-col gap-1">
-            <span className="text-meta text-muted-text">{t('profit')}</span>
-            <span className="text-body font-bold text-body-text"><bdi>{formatCurrency(contract.profit_amount, locale)}</bdi></span>
-          </Card>
-          <Card className="flex flex-col gap-1">
-            <span className="text-meta text-muted-text">{t('totalDue')}</span>
-            <span className="text-body font-bold text-body-text"><bdi>{formatCurrency(contract.total_due, locale)}</bdi></span>
-          </Card>
-        </div>
+          }
+        />
 
         <Card className="flex flex-col gap-4">
-          <h2 className="text-body font-bold text-body-text">{t('scheduleTitle')}</h2>
+          <CardHeading icon={<IconInvoice className="h-5 w-5" />}>{t('scheduleTitle')}</CardHeading>
           <div className="flex flex-col gap-2">
             {contract.schedule.map((item) => (
               <div
@@ -289,18 +277,14 @@ function OfferView({
   ];
   return (
     <div className="flex flex-col gap-6">
-      <Card className="flex flex-col gap-2 border-accent/30 bg-gradient-to-br from-accent/10 to-transparent">
-        <span className="text-meta text-body-text-muted">{t('offerCash')}</span>
-        <span className="text-display font-bold text-accent">
-          <bdi>{formatCurrency(offer.principal, locale)}</bdi>
-        </span>
-        <span className="text-meta text-body-text-muted">
-          {t('advanceRatio', { pct: Math.round(offer.advance_ratio * 100) })}
-        </span>
-      </Card>
+      <FinCard
+        badge={t('offerCash')}
+        amount={formatCurrency(offer.principal, locale)}
+        amountCaption={t('advanceRatio', { pct: Math.round(offer.advance_ratio * 100) })}
+      />
 
       <Card className="flex flex-col gap-3">
-        <h2 className="text-body font-bold text-body-text">{t('costBreakdown')}</h2>
+        <CardHeading icon={<IconSharia className="h-5 w-5" />}>{t('costBreakdown')}</CardHeading>
         <p className="text-meta text-body-text-muted">{t('murabahaNote')}</p>
         <div className="flex flex-col divide-y divide-hairline">
           {rows.map((r) => (
@@ -376,7 +360,7 @@ function AssessmentView({
       </Card>
 
       <Card className="flex flex-col gap-3">
-        <h2 className="text-body font-bold text-body-text">{t('whyTitle')}</h2>
+        <CardHeading icon={<IconSharia className="h-5 w-5" />}>{t('whyTitle')}</CardHeading>
         <ul className="flex flex-col gap-1.5">
           {decision.reasons.map((r, i) => (
             <li key={i} className="flex gap-2 text-body text-body-text-muted">
@@ -388,7 +372,7 @@ function AssessmentView({
       </Card>
 
       <Card className="flex flex-col gap-4">
-        <h2 className="text-body font-bold text-body-text">{t('contributionsTitle')}</h2>
+        <CardHeading icon={<IconGrowth className="h-5 w-5" />}>{t('contributionsTitle')}</CardHeading>
         <ContributionBars items={contributions} />
       </Card>
 
