@@ -10,6 +10,8 @@ import { qk } from '@/lib/query';
 import type { Role, UserOut } from '@/lib/types';
 import { Spinner } from '@/components/ui/primitives';
 import { RafidMark } from '@/components/rafid-mark';
+import { LangToggle } from '@/components/lang-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type NavItem = { href: string; label: string };
 
@@ -105,14 +107,19 @@ export function AppShell({
             );
           })}
         </nav>
-        <div className="flex items-center gap-3">
+        {/* Language and theme live here, not in the global header: that header
+            is suppressed on every AppShell route (see `isAppRoute`), so this is
+            the only place an authed user can reach them. */}
+        <div className="flex items-center gap-2">
           <span className="hidden text-meta text-muted-text sm:inline">
             <bdi>{user.email}</bdi>
           </span>
+          <LangToggle />
+          <ThemeToggle />
           <button
             type="button"
             onClick={logout}
-            className="inline-flex items-center gap-1.5 rounded-pill border border-hairline px-3 py-2 text-meta text-body-text-muted transition-colors hover:border-accent hover:text-accent"
+            className="inline-flex h-11 items-center gap-1.5 rounded-pill border border-hairline px-4 text-meta text-body-text-muted transition-colors hover:border-accent hover:text-accent"
           >
             <LogOut aria-hidden className="h-4 w-4" />
             {t('logout')}
