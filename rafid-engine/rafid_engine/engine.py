@@ -49,7 +49,7 @@ def assess(features: MerchantFeatures, audience: str = "merchant") -> Decision:
     conf = assess_confidence(features)
     outcome, decision_rules = evaluate_decision(card.score_850, conf.value, features)
     funding = _build_funding(outcome, card.grade, features)
-    story = build_explanation(features, card, outcome, funding, decision_rules, audience)
+    story = build_explanation(card, outcome, funding, decision_rules, audience)
 
     return Decision(
         engine_version=config.ENGINE_VERSION,

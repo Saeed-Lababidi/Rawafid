@@ -1,49 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useQueries } from '@tanstack/react-query';
+import { ArrowLeft, ArrowRight, PlugZap } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { AppShell } from '@/components/app/app-shell';
-import { Card, CardHeading, Chip, Spinner } from '@/components/ui/primitives';
+import { Card, CardHeading, Chip } from '@/components/ui/primitives';
 import { FinCard } from '@/components/brand';
 import { IconCashflow, IconGrowth, IconRiskShield } from '@/components/brand-icons';
+import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { AreaChart } from '@/components/ui/charts';
+import { PlatformBreakdown } from '@/components/app/platform-breakdown';
 import {
   aggregate,
   getAlerts,
   getAssessments,
+  getConnections,
   getContracts,
   getMerchant,
   getSales,
   getSettlements,
 } from '@/lib/api';
-import { formatCurrency, formatDate, type Locale } from '@/lib/format';
-import type {
-  AssessmentOut,
-  ContractOut,
-  MerchantOut,
-  RiskAlertOut,
-  SalesOrderOut,
-  SettlementOut,
-} from '@/lib/types';
-
-const MERCHANT_NAV = [
-  { href: '/dashboard', key: 'dashboard' },
-  { href: '/financing', key: 'financing' },
-];
-
-// Group completed sales into a daily-revenue series for the area chart.
-function dailyRevenue(sales: SalesOrderOut[]): { label: string; value: number }[] {
-  const byDay = new Map<string, number>();
-  for (const s of sales) {
-    if (s.status !== 'completed') continue;
-    byDay.set(s.order_date, (byDay.get(s.order_date) ?? 0) + s.amount);
-  }
-  return [...byDay.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([label, value]) => ({ label, value }));
-}
+import { POLL, qk } from '@/lib/query';
+import { MERCHANT_NAV } from '@/lib/nav';
+import { byPlatform, completedOrderCount, dailyRevenue, totalRevenue } from '@/lib/sales';
+import { formatCurrency, formatDate, formatNumber, type Locale } from '@/lib/format';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
@@ -53,60 +34,80 @@ export default function DashboardPage() {
 
   const nav = MERCHANT_NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
 
-  const [merchant, setMerchant] = useState<MerchantOut | null>(null);
-  const [held, setHeld] = useState<number | null>(null);
-  const [sales, setSales] = useState<SalesOrderOut[]>([]);
-  const [settlements, setSettlements] = useState<SettlementOut[]>([]);
-  const [contracts, setContracts] = useState<ContractOut[]>([]);
-  const [assessment, setAssessment] = useState<AssessmentOut | null>(null);
-  const [alerts, setAlerts] = useState<RiskAlertOut[]>([]);
-  const [loading, setLoading] = useState(true);
+  // `aggregate` is a POST but is idempotent/incremental — re-running returns
+  // zero new rows and the current held-receivables total (FRONTEND_GUIDE §6.3),
+  // which is the hero number here. Settlements/contracts poll because the
+  // monitoring agent moves them on its own.
+  const [
+    merchantQ,
+    aggregateQ,
+    salesQ,
+    settlementsQ,
+    contractsQ,
+    assessmentsQ,
+    alertsQ,
+    connectionsQ,
+  ] = useQueries({
+    queries: [
+      { queryKey: qk.merchant, queryFn: getMerchant },
+      { queryKey: qk.aggregate, queryFn: aggregate },
+      { queryKey: qk.sales(5000), queryFn: () => getSales(5000) },
+      { queryKey: qk.settlements, queryFn: getSettlements, refetchInterval: POLL.ambient },
+      { queryKey: qk.contracts, queryFn: getContracts, refetchInterval: POLL.ambient },
+      { queryKey: qk.assessments, queryFn: getAssessments },
+      { queryKey: qk.alerts, queryFn: getAlerts, refetchInterval: POLL.ambient },
+      { queryKey: qk.connections, queryFn: getConnections },
+    ],
+  });
 
-  useEffect(() => {
-    let alive = true;
-    async function load() {
-      const [m, agg, s, st, c, a, al] = await Promise.all([
-        getMerchant(),
-        aggregate(),
-        getSales(),
-        getSettlements(),
-        getContracts(),
-        getAssessments(),
-        getAlerts(),
-      ]);
-      if (!alive) return;
-      setMerchant(m);
-      setHeld(agg.held_receivables_total);
-      setSales(s);
-      setSettlements(st);
-      setContracts(c);
-      setAssessment(a[0] ?? null);
-      setAlerts(al);
-      setLoading(false);
-    }
-    load().catch(() => setLoading(false));
-    const id = setInterval(() => {
-      getSettlements().then((st) => alive && setSettlements(st)).catch(() => {});
-      getContracts().then((c) => alive && setContracts(c)).catch(() => {});
-    }, 10_000);
-    return () => {
-      alive = false;
-      clearInterval(id);
-    };
-  }, []);
+  const isLoading =
+    merchantQ.isLoading || aggregateQ.isLoading || salesQ.isLoading || connectionsQ.isLoading;
+  const isError = merchantQ.isError || aggregateQ.isError;
+  const retry = () => {
+    merchantQ.refetch();
+    aggregateQ.refetch();
+    salesQ.refetch();
+    connectionsQ.refetch();
+  };
 
-  const activeContract = contracts.find((c) => c.status === 'active');
-  const pending = settlements.filter((s) => s.status === 'pending');
+  // A merchant who registered but never finished onboarding has no active
+  // source. Everything below (receivables, revenue, settlements) would render
+  // as zeroes and read like a broken dashboard rather than an unfinished setup.
+  const hasActiveConnection = (connectionsQ.data ?? []).some((c) => c.status === 'active');
+
+  const merchant = merchantQ.data;
+  const held = aggregateQ.data?.held_receivables_total ?? null;
+  const activeContract = contractsQ.data?.find((c) => c.status === 'active');
+  const assessment = assessmentsQ.data?.[0];
+  const alerts = alertsQ.data ?? [];
+  const pending = (settlementsQ.data ?? []).filter((s) => s.status === 'pending');
+
+  const sales = salesQ.data ?? [];
   const revenueSeries = dailyRevenue(sales);
+  const platforms = byPlatform(sales);
+  const revenue90d = totalRevenue(sales);
+  const orders90d = completedOrderCount(sales);
 
   return (
     <AppShell role="merchant" nav={nav}>
-      {() =>
-        loading ? (
-          <div className="flex min-h-[40vh] items-center justify-center">
-            <Spinner className="h-7 w-7" />
-          </div>
-        ) : (
+      {() => (
+        <QueryBoundary
+          isLoading={isLoading}
+          isError={isError}
+          onRetry={retry}
+          skeleton={
+            <div className="flex flex-col gap-6">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-36 w-full" />
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+              </div>
+              <Skeleton className="h-56 w-full" />
+            </div>
+          }
+        >
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1">
               <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-text">{t('greeting')}</span>
@@ -115,35 +116,90 @@ export default function DashboardPage() {
               </h1>
             </div>
 
-            {/* Hero: held receivables - the signature financing card */}
+            {!hasActiveConnection ? (
+              <Card className="flex flex-col items-center gap-5 py-12 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-accent/10">
+                  <PlugZap aria-hidden className="h-8 w-8 text-accent" />
+                </div>
+                <div className="flex max-w-md flex-col gap-2">
+                  <h2 className="font-display text-h1 font-bold text-brand-navy dark:text-brand-cream">
+                    {t('onboardTitle')}
+                  </h2>
+                  <p className="text-body text-body-text-muted">{t('onboardBody')}</p>
+                </div>
+                <Link
+                  href="/connect"
+                  locale={locale}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-pill bg-accent px-6 text-body font-bold text-accent-foreground transition-opacity hover:opacity-90"
+                >
+                  {t('onboardCta')}
+                  <Arrow aria-hidden className="h-4 w-4" />
+                </Link>
+              </Card>
+            ) : (
+              <>
+            {/* Hero: the unified sales view. The dashboard is the product and
+                financing is one feature inside it, so total sales across every
+                platform leads and the cash advance sits below as an option. */}
             <FinCard
-              badge={t('heldBadge')}
-              amount={formatCurrency(held, locale)}
+              badge={t('salesBadge')}
+              amount={formatCurrency(revenue90d, locale)}
+              amountCaption={t('last90d')}
               rows={[
-                {
-                  label: t('activeOutstanding'),
-                  value: activeContract ? formatCurrency(activeContract.outstanding, locale) : '-',
-                },
+                { label: t('ordersLabel'), value: formatNumber(orders90d, locale) },
+                { label: t('platformsLabel'), value: formatNumber(platforms.length, locale) },
                 {
                   label: t('latestScore'),
                   value: assessment ? `${assessment.score} · ${assessment.risk_band}` : '-',
                 },
-                { label: t('pendingSettlements'), value: pending.length },
               ]}
               footer={
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <span className="max-w-xs text-[13px] text-brand-cream/60">{t('heldHint')}</span>
+                  <span className="max-w-xs text-[13px] text-brand-cream/60">{t('salesHint')}</span>
                   <Link
-                    href="/financing"
+                    href="/sales"
                     locale={locale}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-pill bg-accent px-6 font-display text-body font-bold text-accent-foreground shadow-[0_12px_24px_-14px_rgba(195,107,78,0.9)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-pill border border-brand-cream/25 px-6 font-display text-body font-bold text-brand-cream transition-colors hover:border-brand-terra hover:text-brand-terra"
                   >
-                    {t('getFinancing')}
+                    {t('viewSales')}
                     <Arrow aria-hidden className="h-4 w-4" />
                   </Link>
                 </div>
               }
             />
+
+            {/* Per-platform breakdown - the unified view made concrete */}
+            <PlatformBreakdown platforms={platforms} />
+
+            {/* Cash held by aggregators: the optional unlock, not the headline */}
+            <Card className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-text">
+                  {t('heldReceivables')}
+                </span>
+                <span className="font-display text-h1 font-bold text-brand-navy dark:text-brand-cream">
+                  <bdi>{formatCurrency(held, locale)}</bdi>
+                </span>
+                <span className="max-w-md text-meta text-body-text-muted">{t('heldHint')}</span>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                {activeContract ? (
+                  <span className="font-mono text-meta text-muted-text">
+                    {t('outstandingInline', {
+                      amount: formatCurrency(activeContract.outstanding, locale),
+                    })}
+                  </span>
+                ) : null}
+                <Link
+                  href="/financing"
+                  locale={locale}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-pill bg-accent px-6 text-body font-bold text-accent-foreground transition-opacity hover:opacity-90"
+                >
+                  {activeContract ? t('viewContract') : t('getFinancing')}
+                  <Arrow aria-hidden className="h-4 w-4" />
+                </Link>
+              </div>
+            </Card>
 
             {/* Revenue chart */}
             <Card className="flex flex-col gap-4">
@@ -206,9 +262,11 @@ export default function DashboardPage() {
                 </div>
               </Card>
             </div>
+              </>
+            )}
           </div>
-        )
-      }
+        </QueryBoundary>
+      )}
     </AppShell>
   );
 }

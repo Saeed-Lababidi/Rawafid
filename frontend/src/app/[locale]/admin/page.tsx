@@ -1,22 +1,26 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { FastForward } from 'lucide-react';
+import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, ArrowRight, FastForward } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import { AppShell } from '@/components/app/app-shell';
-import { Button, Card, CardHeading, Chip, Spinner, StatTile } from '@/components/ui/primitives';
+import { Button, Card, CardHeading, Chip, StatTile } from '@/components/ui/primitives';
 import { IconGrowth, IconRiskShield, IconSME } from '@/components/brand-icons';
+import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { bandColor, Donut, FunnelBars } from '@/components/ui/charts';
+import { useToast } from '@/components/providers/toast-provider';
 import {
   getAdminAlerts,
   getAdminMerchants,
   getPortfolio,
   monitorTick,
 } from '@/lib/api';
+import { POLL, qk } from '@/lib/query';
+import { ADMIN_NAV } from '@/lib/nav';
 import { formatCurrency, type Locale } from '@/lib/format';
-import type { MerchantOut, PortfolioOut, RiskAlertOut } from '@/lib/types';
 
-const NAV = [{ href: '/admin', key: 'portfolio' }];
 const BANDS = ['A', 'B', 'C', 'D'] as const;
 
 export default function AdminPage() {
@@ -24,53 +28,69 @@ export default function AdminPage() {
   const tNav = useTranslations('app');
   const tDash = useTranslations('dashboard');
   const locale = useLocale() as Locale;
-  const nav = NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
+  const nav = ADMIN_NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
+  const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight;
 
-  const [portfolio, setPortfolio] = useState<PortfolioOut | null>(null);
-  const [merchants, setMerchants] = useState<MerchantOut[]>([]);
-  const [alerts, setAlerts] = useState<RiskAlertOut[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [ticking, setTicking] = useState(false);
+  const queryClient = useQueryClient();
+  const { toastError } = useToast();
   const [simDate, setSimDate] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    const [p, m, a] = await Promise.all([getPortfolio(), getAdminMerchants(), getAdminAlerts()]);
-    setPortfolio(p);
-    setMerchants(m);
-    setAlerts(a);
-  }, []);
+  const [portfolioQ, merchantsQ, alertsQ] = useQueries({
+    queries: [
+      { queryKey: qk.adminPortfolio, queryFn: getPortfolio, refetchInterval: POLL.ambient },
+      { queryKey: qk.adminMerchants, queryFn: getAdminMerchants },
+      { queryKey: qk.adminAlerts, queryFn: getAdminAlerts, refetchInterval: POLL.ambient },
+    ],
+  });
 
-  useEffect(() => {
-    refresh()
-      .then(() => setLoading(false))
-      .catch(() => setLoading(false));
-    const id = setInterval(() => {
-      getPortfolio().then(setPortfolio).catch(() => {});
-      getAdminAlerts().then(setAlerts).catch(() => {});
-    }, 10_000);
-    return () => clearInterval(id);
-  }, [refresh]);
-
-  async function onTick() {
-    setTicking(true);
-    try {
-      const res = await monitorTick();
+  // Manual day-advance: the presenter's control when the background scheduler
+  // is disabled for a demo (MONITOR_ENABLED=false).
+  const tickM = useMutation({
+    mutationFn: monitorTick,
+    onSuccess: (res) => {
       setSimDate(res.sim_date);
-      await refresh();
-    } catch {
-      /* ignore */
-    }
-    setTicking(false);
-  }
+      queryClient.invalidateQueries({ queryKey: qk.adminPortfolio });
+      queryClient.invalidateQueries({ queryKey: qk.adminAlerts });
+      queryClient.invalidateQueries({ queryKey: qk.adminMerchants });
+    },
+    onError: (e) => toastError(e, t('tickError')),
+  });
+
+  const portfolio = portfolioQ.data;
+  const merchants = merchantsQ.data ?? [];
+  const alerts = alertsQ.data ?? [];
 
   return (
     <AppShell role="bank_admin" nav={nav}>
-      {() =>
-        loading || !portfolio ? (
-          <div className="flex min-h-[40vh] items-center justify-center">
-            <Spinner className="h-7 w-7" />
-          </div>
-        ) : (
+      {() => {
+        // Guard before building the tree: JSX children are evaluated eagerly,
+        // so `portfolio.contracts` would throw while the query is still in
+        // flight if this were expressed as a wrapper around the content.
+        if (!portfolio) {
+          return (
+            <QueryBoundary
+              isLoading={portfolioQ.isLoading}
+              isError={portfolioQ.isError}
+              onRetry={() => portfolioQ.refetch()}
+              skeleton={
+                <div className="flex flex-col gap-6">
+                  <Skeleton className="h-8 w-40" />
+                  <div className="grid gap-4 sm:grid-cols-4">
+                    <Skeleton className="h-24" />
+                    <Skeleton className="h-24" />
+                    <Skeleton className="h-24" />
+                    <Skeleton className="h-24" />
+                  </div>
+                  <Skeleton className="h-56 w-full" />
+                </div>
+              }
+            >
+              {null}
+            </QueryBoundary>
+          );
+        }
+
+        return (
           <div className="flex flex-col gap-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-col gap-1">
@@ -81,7 +101,11 @@ export default function AdminPage() {
                 {simDate ? (
                   <span className="text-meta text-muted-text">{t('simDate', { date: simDate })}</span>
                 ) : null}
-                <Button variant="secondary" loading={ticking} onClick={onTick}>
+                <Button
+                  variant="secondary"
+                  loading={tickM.isPending}
+                  onClick={() => tickM.mutate()}
+                >
                   <FastForward aria-hidden className="h-4 w-4" />
                   {t('advanceDay')}
                 </Button>
@@ -100,8 +124,9 @@ export default function AdminPage() {
                 value={formatCurrency(portfolio.contracts.outstanding_total, locale)}
               />
               <StatTile
-                label={t('expectedRevenue')}
+                label={t('expectedReturn')}
                 value={formatCurrency(portfolio.contracts.expected_revenue, locale)}
+                hint={t('expectedReturnHint')}
                 accent
               />
             </div>
@@ -185,26 +210,44 @@ export default function AdminPage() {
               </div>
             </Card>
 
-            {/* Merchant list */}
+            {/* Merchant list — each row opens the underwriter's full file */}
             <Card className="flex flex-col gap-4">
-              <CardHeading icon={<IconSME className="h-5 w-5" />}>{t('merchantsTitle')}</CardHeading>
+              <div className="flex flex-col gap-1">
+                <CardHeading icon={<IconSME className="h-5 w-5" />}>
+                  {t('merchantsTitle')}
+                </CardHeading>
+                <p className="text-meta text-muted-text">{t('merchantsHint')}</p>
+              </div>
               <div className="flex flex-col divide-y divide-hairline">
                 {merchants.map((m) => (
-                  <div key={m.id} className="flex items-center justify-between py-2.5">
+                  <Link
+                    key={m.id}
+                    href={`/admin/merchants/${m.id}`}
+                    locale={locale}
+                    className="group flex items-center justify-between gap-3 py-2.5 transition-colors hover:text-accent"
+                  >
                     <div className="flex flex-col">
-                      <span className="text-body font-bold text-body-text"><bdi>{m.name}</bdi></span>
+                      <span className="text-body font-bold text-body-text group-hover:text-accent">
+                        <bdi>{m.name}</bdi>
+                      </span>
                       <span className="text-meta text-muted-text capitalize">
                         <bdi>{m.business_type}</bdi> · <bdi>{m.city}</bdi>
                       </span>
                     </div>
-                    <Chip tone="good">{t('verified')}</Chip>
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <Chip tone="good">{t('verified')}</Chip>
+                      <Arrow
+                        aria-hidden
+                        className="h-4 w-4 text-muted-text group-hover:text-accent"
+                      />
+                    </div>
+                  </Link>
                 ))}
               </div>
             </Card>
           </div>
-        )
-      }
+        );
+      }}
     </AppShell>
   );
 }
