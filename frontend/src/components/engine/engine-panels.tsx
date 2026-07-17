@@ -126,19 +126,19 @@ export function FactorBars({ riskScore }: { riskScore: EngineRiskScore }) {
         <p className="text-meta text-muted-text">{t('factorsHint')}</p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-5">
         {factors.map((f) => (
-          <div key={f.code} className="flex flex-col gap-1">
+          <div key={f.code} className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-meta text-body-text">{localized(f.name, locale)}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-meta text-muted-text">{localized(f.detail, locale)}</span>
-                <span className="w-12 text-end text-meta font-bold text-body-text tabular-nums">
+              <span className="text-body font-bold text-body-text">{localized(f.name, locale)}</span>
+              <div className="flex items-center gap-2.5">
+                <span className="text-body text-muted-text">{localized(f.detail, locale)}</span>
+                <span className="w-14 text-end text-body font-bold text-body-text tabular-nums">
                   <bdi>{f.contribution_pct.toFixed(1)}%</bdi>
                 </span>
               </div>
             </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-pill bg-hairline">
+            <div className="h-3.5 w-full overflow-hidden rounded-pill bg-hairline">
               <div
                 className="h-full rounded-pill transition-[width] duration-700"
                 style={{

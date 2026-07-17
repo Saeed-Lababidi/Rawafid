@@ -3,7 +3,13 @@
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.enums import ConnectionStatus, ContractStatus, OfferStatus
+from app.domain.enums import (
+    ConnectionStatus,
+    ConnectionType,
+    ContractStatus,
+    OfferStatus,
+    SettlementStatus,
+)
 from app.domain.models import (
     Connection,
     CreditAssessment,
@@ -11,6 +17,8 @@ from app.domain.models import (
     Merchant,
     MurabahaContract,
     RiskAlert,
+    SalesOrderRow,
+    SettlementRow,
 )
 
 
@@ -96,6 +104,132 @@ async def portfolio(session: AsyncSession) -> dict:
         },
         "open_alerts": open_alerts,
     }
+
+
+async def merchants_summary(session: AsyncSession) -> list[dict]:
+    """Portfolio table: one enriched row per merchant for the underwriter list.
+
+    Everything is read from already-stored rows in a handful of grouped queries
+    (no per-merchant fan-out), then stitched together in Python.
+    """
+    merchants = (
+        (await session.execute(select(Merchant).order_by(Merchant.created_at)))
+        .scalars()
+        .all()
+    )
+
+    # latest assessment per merchant -> score / band / decision
+    latest = (
+        select(
+            CreditAssessment.merchant_id,
+            func.max(CreditAssessment.created_at).label("latest_at"),
+        )
+        .group_by(CreditAssessment.merchant_id)
+        .subquery()
+    )
+    assess = {
+        mid: (score, band, approved)
+        for mid, score, band, approved in (
+            await session.execute(
+                select(
+                    CreditAssessment.merchant_id,
+                    CreditAssessment.score,
+                    CreditAssessment.risk_band,
+                    CreditAssessment.approved,
+                ).join(
+                    latest,
+                    (CreditAssessment.merchant_id == latest.c.merchant_id)
+                    & (CreditAssessment.created_at == latest.c.latest_at),
+                )
+            )
+        ).all()
+    }
+
+    platforms: dict[str, list[str]] = {}
+    for mid, inst in (
+        await session.execute(
+            select(Connection.merchant_id, Connection.institution).where(
+                Connection.type == ConnectionType.SALES.value,
+                Connection.status == ConnectionStatus.ACTIVE.value,
+            )
+        )
+    ).all():
+        platforms.setdefault(mid, []).append(inst)
+
+    def _sum_by_merchant(rows) -> dict[str, float]:
+        return {mid: float(total) for mid, total in rows}
+
+    volume = _sum_by_merchant(
+        (
+            await session.execute(
+                select(
+                    SalesOrderRow.merchant_id,
+                    func.coalesce(func.sum(SalesOrderRow.amount), 0.0),
+                )
+                .where(SalesOrderRow.status == "completed")
+                .group_by(SalesOrderRow.merchant_id)
+            )
+        ).all()
+    )
+    held = _sum_by_merchant(
+        (
+            await session.execute(
+                select(
+                    SettlementRow.merchant_id,
+                    func.coalesce(func.sum(SettlementRow.amount), 0.0),
+                )
+                .where(SettlementRow.status == SettlementStatus.PENDING.value)
+                .group_by(SettlementRow.merchant_id)
+            )
+        ).all()
+    )
+    outstanding = _sum_by_merchant(
+        (
+            await session.execute(
+                select(
+                    MurabahaContract.merchant_id,
+                    func.coalesce(func.sum(MurabahaContract.outstanding), 0.0),
+                )
+                .where(MurabahaContract.status == ContractStatus.ACTIVE.value)
+                .group_by(MurabahaContract.merchant_id)
+            )
+        ).all()
+    )
+    open_alerts = {
+        mid: count
+        for mid, count in (
+            await session.execute(
+                select(RiskAlert.merchant_id, func.count())
+                .where(RiskAlert.resolved.is_(False))
+                .group_by(RiskAlert.merchant_id)
+            )
+        ).all()
+    }
+
+    rows: list[dict] = []
+    for m in merchants:
+        a = assess.get(m.id)
+        plats = sorted(platforms.get(m.id, []))
+        rows.append(
+            {
+                "id": m.id,
+                "name": m.name,
+                "business_type": m.business_type,
+                "city": m.city,
+                "verification_status": m.verification_status,
+                "established_at": m.established_at,
+                "score": a[0] if a else None,
+                "risk_band": a[1] if a else None,
+                "approved": a[2] if a else None,
+                "platforms": plats,
+                "platform_count": len(plats),
+                "sales_volume": round(volume.get(m.id, 0.0), 2),
+                "held_receivables": round(held.get(m.id, 0.0), 2),
+                "outstanding": round(outstanding.get(m.id, 0.0), 2),
+                "open_alerts": open_alerts.get(m.id, 0),
+            }
+        )
+    return rows
 
 
 async def merchant_overview(session: AsyncSession, merchant: Merchant) -> dict:

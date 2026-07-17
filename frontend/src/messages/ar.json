@@ -345,7 +345,10 @@
     "platforms": {
       "salla": "سلة",
       "zid": "زد",
+      "noon": "نون",
       "jahez": "جاهز",
+      "hungerstation": "هنقرستيشن",
+      "mrsool": "مرسول",
       "foodics": "فودكس"
     },
     "status": {
@@ -523,6 +526,10 @@
     "activeContracts": "العقود النشطة",
     "disbursed": "إجمالي المصروف",
     "outstanding": "إجمالي المتبقي",
+    "portfolioSales": "مبيعات المحفظة (٩٠ يوماً)",
+    "portfolioSalesHint": "المبيعات المؤكّدة عبر كل تاجر مرتبط وكل وسيط.",
+    "heldReceivables": "المستحقات المحتجزة",
+    "heldReceivablesHint": "الأرباح المؤكّدة المحتجزة خلف الوسطاء، على مستوى المحفظة كاملةً.",
     "funnelTitle": "قمع الإصدار",
     "funnel": {
       "registered": "مُسجَّل",
@@ -539,6 +546,15 @@
     "merchantsTitle": "التجّار",
     "verified": "موثّق",
     "merchantsHint": "افتح أي تاجر لعرض ملف الاكتتاب الكامل.",
+    "colMerchant": "التاجر",
+    "colChannels": "القنوات",
+    "colVolume": "المبيعات (٩٠ يوماً)",
+    "colHeld": "محتجز",
+    "colRisk": "المخاطر",
+    "merchantScore": "التقييم {score}",
+    "notScored": "لم يُقيَّم بعد",
+    "channelsCount": "{count, plural, zero {# قناة} one {# قناة} two {قناتان} few {# قنوات} many {# قناة} other {# قناة}}",
+    "alertsCount": "{count, plural, zero {# تنبيه} one {# تنبيه} two {تنبيهان} few {# تنبيهات} many {# تنبيهاً} other {# تنبيه}}",
     "expectedReturn": "العائد المتوقع للبنك",
     "expectedReturnHint": "ربح المرابحة المُفصَح عنه والرسوم عبر محفظة التمويل لدى الإنماء. هذا عائد البنك، وليس إيراد رافد."
   },

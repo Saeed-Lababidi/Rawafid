@@ -13,7 +13,7 @@ from datetime import date, timedelta
 
 from app.providers.base import (
     BANK_INSTITUTIONS,
-    SALES_PLATFORMS,
+    SECTOR_PLATFORMS,
     BankAccount,
     SalesOrder,
     Settlement,
@@ -39,6 +39,7 @@ def _rng(s: str) -> random.Random:
 @dataclass(frozen=True)
 class MerchantProfile:
     merchant_id: str
+    sector: str  # "ecommerce" | "food" — decides which aggregator pool
     platforms: list[str]
     bank: str
     base_daily: float  # SAR/day across all platforms
@@ -53,10 +54,16 @@ class MerchantProfile:
 
 def profile_for(merchant_id: str) -> MerchantProfile:
     r = _rng(f"profile:{merchant_id}")
-    n_platforms = 1 if r.random() < 0.55 else 2
-    platforms = r.sample(SALES_PLATFORMS, n_platforms)
+    sector = r.choice(list(SECTOR_PLATFORMS))
+    pool = SECTOR_PLATFORMS[sector]
+    # Every merchant sells across multiple aggregators — that unified view is the
+    # product. Take most of the sector's pool (min 2), so the dashboard always
+    # shows a real channel mix. platforms[0] is the lead channel (see share).
+    n_platforms = r.randint(min(2, len(pool)), len(pool))
+    platforms = r.sample(pool, n_platforms)
     return MerchantProfile(
         merchant_id=merchant_id,
+        sector=sector,
         platforms=platforms,
         bank=r.choice(BANK_INSTITUTIONS),
         base_daily=round(r.uniform(800, 15000), 2),
@@ -71,10 +78,18 @@ def profile_for(merchant_id: str) -> MerchantProfile:
 
 
 def platform_share(profile: MerchantProfile, platform: str) -> float:
-    if len(profile.platforms) == 1:
-        return 1.0
-    major = _rng(f"share:{profile.merchant_id}").uniform(0.55, 0.8)
-    return major if platform == profile.platforms[0] else 1 - major
+    """Each platform's fraction of revenue, deterministic and summing to 1.
+
+    The lead channel (platforms[0]) is weighted up so there is always a
+    concentration signal for the engine's CHANNEL/PLATFORM factor to read,
+    rather than an unrealistically even split across every aggregator.
+    """
+    weights: dict[str, float] = {}
+    for i, p in enumerate(profile.platforms):
+        w = _rng(f"share:{profile.merchant_id}:{p}").uniform(0.4, 1.0)
+        weights[p] = w * 2.0 if i == 0 else w
+    total = sum(weights.values())
+    return weights[platform] / total
 
 
 def daily_platform_revenue(profile: MerchantProfile, platform: str, d: date,
