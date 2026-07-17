@@ -152,21 +152,24 @@ html {
 }
 
 /* ============================================================
-   Scroll-reveal choreography (anime.js drives the transforms;
-   these only set the pre-animation resting state). Elements are
-   hidden only once the JS controller has flagged the document
-   ready, so a no-JS / pre-hydration paint still shows everything.
+   Scroll-reveal + hero-entrance resting state (anime.js drives
+   the transforms; these only hold the pre-animation opacity).
+   The `anim-ready` flag is set by a blocking script in layout.tsx
+   BEFORE first paint, so gated elements never flash in visible
+   before their entrance. No JS (the script never runs) leaves
+   everything visible, so nothing can strand hidden.
    ============================================================ */
-html.anim-ready [data-reveal] {
+html.anim-ready [data-reveal],
+html.anim-ready [data-hero] {
   opacity: 0;
-  will-change: transform, opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  html.anim-ready [data-reveal] {
+  html.anim-ready [data-reveal],
+  html.anim-ready [data-hero] {
     opacity: 1 !important;
     transform: none !important;
   }
@@ -220,6 +223,12 @@ html.anim-ready [data-reveal] {
   opacity: 0.5;
   stroke-dasharray: 6 260;
   animation: rafid-drift 9s linear infinite;
+}
+
+/* Freeze the drift while its surface is scrolled off-screen (JS toggles this) -
+   stroke-dashoffset can't be composited, so an off-screen loop just burns paint. */
+.flow-paused .flow-line {
+  animation-play-state: paused;
 }
 
 /* Direction-aware decorative strokes (solution diagram converge/diverge). */
