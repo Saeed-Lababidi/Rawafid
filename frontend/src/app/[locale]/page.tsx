@@ -99,7 +99,7 @@ export default function LandingPage() {
           </nav>
           <Link
             href="/login"
-            className="inline-flex h-9 items-center justify-center rounded-pill bg-accent px-4 text-[13px] font-bold text-accent-foreground transition-transform hover:-translate-y-0.5"
+            className="inline-flex h-9 items-center justify-center rounded-pill bg-accent px-4 text-[13px] font-bold text-accent-foreground"
           >
             {tNav('getStarted')}
           </Link>
@@ -109,21 +109,20 @@ export default function LandingPage() {
       {/* ================= HERO ================= */}
       <section
         id="top"
-        className="relative flex min-h-screen flex-col overflow-hidden bg-brand-navy text-brand-cream"
+        className="relative flex min-h-screen flex-col overflow-hidden bg-page-bg text-body-text"
       >
-        <FlowLines className="pointer-events-none absolute inset-0 h-full w-full opacity-90" idSuffix="hero" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgba(195,107,78,0.18),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgba(195,107,78,0.12),transparent_55%)]" />
 
         {/* hero nav */}
         <nav className="relative z-10">
           <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-5 sm:px-6">
             <a href="#top" className="flex items-center gap-3">
-              <RafidMark className="h-10 w-14" strokeClassName="text-brand-cream" />
-              <span className="font-display text-[18px] font-semibold tracking-tight text-white">
+              <RafidMark className="h-10 w-14" />
+              <span className="font-display text-[18px] font-semibold tracking-tight text-brand-navy dark:text-brand-cream">
                 {tHero('tag')}
               </span>
             </a>
-            <div className="hidden items-center gap-7 font-mono text-[12.5px] uppercase tracking-[0.08em] text-brand-cream/60 lg:flex">
+            <div className="hidden items-center gap-7 font-mono text-[12.5px] uppercase tracking-[0.08em] text-body-text-muted lg:flex">
               {tabs.map((t) => (
                 <a key={t.id} data-navlink={t.id} href={`#${t.id}`} className="transition-colors hover:text-brand-terra">
                   {t.label}
@@ -144,7 +143,7 @@ export default function LandingPage() {
               <div data-hero="eyebrow" style={{ opacity: 0 }} className="mb-6 font-mono text-[12px] uppercase tracking-[0.24em] text-brand-terra">
                 {tHero('tag')}
               </div>
-              <h1 className="font-display text-[clamp(44px,7vw,86px)] font-bold leading-[0.95] tracking-[-0.03em] text-white">
+              <h1 className="font-display text-[clamp(30px,7vw,70px)] font-bold leading-[0.95] tracking-[-0.03em] text-brand-navy dark:text-brand-cream">
                 <span data-hero="line" style={{ opacity: 0 }} className="block">
                   {tHero('headline1')}
                 </span>
@@ -155,7 +154,7 @@ export default function LandingPage() {
                   {tHero('headline3')}
                 </span>
               </h1>
-              <p data-hero="sub" style={{ opacity: 0 }} className="mt-7 max-w-[52ch] text-[18px] leading-relaxed text-brand-cream/75">
+              <p data-hero="sub" style={{ opacity: 0 }} className="mt-7 max-w-[52ch] text-[18px] leading-relaxed text-body-text-muted">
                 {tHero('subheadline')}
               </p>
               <div className="mt-9 flex flex-wrap gap-3.5">
@@ -163,7 +162,7 @@ export default function LandingPage() {
                   data-hero="cta"
                   style={{ opacity: 0 }}
                   href="/login"
-                  className="inline-flex h-12 items-center justify-center rounded-tile bg-accent px-7 text-body font-bold text-accent-foreground shadow-[0_14px_30px_-12px_rgba(195,107,78,0.9)] transition-transform hover:-translate-y-0.5"
+                  className="inline-flex h-12 items-center justify-center rounded-tile bg-accent px-7 text-body font-bold text-accent-foreground shadow-[0_14px_30px_-12px_rgba(195,107,78,0.9)]"
                 >
                   {tHero('ctaPrimary')}
                 </Link>
@@ -171,12 +170,12 @@ export default function LandingPage() {
                   data-hero="cta"
                   style={{ opacity: 0 }}
                   href="#solution"
-                  className="inline-flex h-12 items-center justify-center rounded-tile border-[1.5px] border-white/25 px-7 text-body font-bold text-white transition-colors hover:border-brand-terra hover:text-brand-terra"
+                  className="inline-flex h-12 items-center justify-center rounded-tile border-[1.5px] border-brand-navy/20 px-7 text-body font-bold text-brand-navy transition-colors hover:border-brand-terra hover:text-brand-terra dark:border-white/25 dark:text-white"
                 >
                   {tHero('cta')}
                 </a>
               </div>
-              <div className="mt-12 flex flex-wrap gap-x-9 gap-y-5">
+              {/* <div className="mt-12 flex flex-wrap gap-x-9 gap-y-5">
                 {(['builtFor', 'category', 'model'] as const).map((m) => (
                   <div key={m} data-hero="meta" style={{ opacity: 0 }} className="font-mono text-[11px] uppercase tracking-[0.06em] text-brand-cream/45">
                     {tHero(`meta.${m}Label`)}
@@ -185,7 +184,7 @@ export default function LandingPage() {
                     </b>
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             {/* hero visual: photo + quote card with quote mark */}
@@ -201,7 +200,7 @@ export default function LandingPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/70 via-transparent to-transparent" />
               </div>
-              <figure className="absolute -bottom-7 start-[-14px] max-w-[330px] rounded-2xl border border-white/10 bg-[#06192e]/95 p-5 shadow-[0_24px_50px_-20px_rgba(0,0,0,0.8)] backdrop-blur-sm max-lg:static max-lg:mt-6 max-lg:max-w-none">
+              <figure className="absolute -bottom-15 start-[-28px] max-w-[330px] rounded-2xl border border-white/10 bg-[#06192e]/95 p-5 shadow-[0_24px_50px_-20px_rgba(0,0,0,0.8)] backdrop-blur-sm max-lg:static max-lg:mt-6 max-lg:max-w-none">
                 <Quote aria-hidden className="h-7 w-7 text-brand-terra" strokeWidth={2.2} />
                 <blockquote className="mt-2 font-display text-[16px] font-semibold leading-snug text-white">
                   {tHero('quote.kicker')}
@@ -221,28 +220,40 @@ export default function LandingPage() {
           data-hero="scrollcue"
           data-scrollcue
           style={{ opacity: 0 }}
-          className="absolute inset-x-0 bottom-6 z-[3] mx-auto flex w-max flex-col items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-brand-cream/45 transition-colors hover:text-brand-terra"
+          className="absolute inset-x-0 bottom-6 z-[3] mx-auto flex w-max flex-col items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-body-text-muted transition-colors hover:text-brand-terra"
         >
           {tHero('scrollCue')}
           <span className="cue-dot text-[15px] leading-none">↓</span>
         </a>
       </section>
 
-      {/* ================= PROBLEM ================= */}
-      <section id="problem" className="scroll-mt-20 border-t border-hairline bg-page-bg py-20 lg:py-28">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+      {/* ================= PROBLEM (animated cobalt) ================= */}
+      <section
+        id="problem"
+        className="relative scroll-mt-20 overflow-hidden bg-brand-navy py-20 text-brand-cream lg:py-28"
+      >
+        <FlowLines className="pointer-events-none absolute inset-0 h-full w-full opacity-90" idSuffix="problem" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgba(195,107,78,0.16),transparent_55%)]" />
+        <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
           <div data-reveal>
             <Eyebrow className="text-brand-terra">{tProblem('eyebrow')}</Eyebrow>
           </div>
-          <h2 data-reveal className={`mt-5 max-w-[24ch] ${HEADLINE_H2}`}>
+          <h2
+            data-reveal
+            className="mt-5 max-w-[24ch] font-display text-[clamp(26px,3.6vw,42px)] font-bold leading-[1.1] tracking-tight text-brand-cream"
+          >
             {tProblem('title')}
           </h2>
-          <p data-reveal className="mt-5 max-w-[72ch] text-[18px] leading-relaxed text-body-text-muted">
+          <p data-reveal className="mt-5 max-w-[72ch] text-[18px] leading-relaxed text-brand-cream/75">
             {tProblem('body')}
           </p>
           <div data-reveal-group className="mt-12 grid gap-4 sm:grid-cols-3">
             {(['target', 'actual', 'locked'] as const).map((key) => (
-              <div key={key} data-reveal className="rounded-card border border-hairline bg-card p-7">
+              <div
+                key={key}
+                data-reveal
+                className="rounded-card border border-white/10 bg-white/4 p-7 backdrop-blur-sm"
+              >
                 <div
                   className="font-mono text-[40px] font-medium leading-none text-brand-terra sm:text-[46px]"
                   data-count={tProblem(`stats.${key}.value`)}
@@ -251,13 +262,13 @@ export default function LandingPage() {
                   {tProblem(`stats.${key}.value`)}
                   {tProblem(`stats.${key}.suffix`)}
                 </div>
-                <div className="mt-3 text-[14.5px] leading-snug text-body-text-muted">
+                <div className="mt-3 text-[14.5px] leading-snug text-brand-cream/70">
                   {tProblem(`stats.${key}.label`)}
                 </div>
               </div>
             ))}
           </div>
-          <p data-reveal className="mt-6 font-mono text-[12px] text-muted-text">{tProblem('note')}</p>
+          <p data-reveal className="mt-6 font-mono text-[12px] text-brand-cream/45">{tProblem('note')}</p>
         </div>
       </section>
 
@@ -322,7 +333,7 @@ export default function LandingPage() {
               <div
                 key={f.k}
                 data-reveal
-                className="group rounded-card border border-hairline bg-card p-6 transition-transform hover:-translate-y-1"
+                className="group rounded-card border border-hairline bg-card p-6"
               >
                 <div className="flex items-center justify-between">
                   <f.icon className="h-9 w-9 text-brand-navy dark:text-brand-cream" />
@@ -413,7 +424,7 @@ export default function LandingPage() {
 
           <div data-reveal-group className="mt-12 grid gap-5 sm:grid-cols-2">
             {screens.map((s) => (
-              <figure key={s.k} data-reveal className="overflow-hidden rounded-card border border-hairline bg-card shadow-[0_20px_44px_-30px_rgba(3,35,65,0.4)] transition-transform duration-300 hover:-translate-y-1">
+              <figure key={s.k} data-reveal className="overflow-hidden rounded-card border border-hairline bg-card shadow-[0_20px_44px_-30px_rgba(3,35,65,0.4)]">
                 <div className="flex items-center gap-2 border-b border-hairline px-4 py-2.5">
                   <span className="h-2.5 w-2.5 rounded-full bg-hairline-strong" />
                   <span className="h-2.5 w-2.5 rounded-full bg-hairline-strong" />
@@ -477,7 +488,7 @@ export default function LandingPage() {
             <Link
               data-reveal
               href="/login"
-              className="mt-7 inline-flex h-12 items-center justify-center rounded-tile bg-brand-navy px-7 text-body font-bold text-brand-cream transition-transform hover:-translate-y-0.5"
+              className="mt-7 inline-flex h-12 items-center justify-center rounded-tile bg-brand-navy px-7 text-body font-bold text-brand-cream"
             >
               {tAlinma('cta')}
             </Link>
@@ -580,7 +591,7 @@ export default function LandingPage() {
           <div data-reveal>
             <Link
               href="/login"
-              className="mt-8 inline-flex h-12 items-center justify-center rounded-tile bg-accent px-8 text-body font-bold text-accent-foreground shadow-[0_14px_30px_-12px_rgba(195,107,78,0.9)] transition-transform hover:-translate-y-0.5"
+              className="mt-8 inline-flex h-12 items-center justify-center rounded-tile bg-accent px-8 text-body font-bold text-accent-foreground shadow-[0_14px_30px_-12px_rgba(195,107,78,0.9)]"
             >
               {tFinal('cta')}
             </Link>

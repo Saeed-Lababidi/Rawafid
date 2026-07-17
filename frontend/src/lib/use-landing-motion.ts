@@ -54,9 +54,23 @@ export function useLandingMotion(): void {
       return;
     }
 
+    // will-change is a promise to the compositor, not a decoration: hint it only
+    // for the life of an animation, then hand the layer back. Leaving it on
+    // permanently (as the old CSS did) pins a GPU layer per element forever and
+    // is itself a scroll-jank source.
+    const wc = (els: Iterable<HTMLElement>, on: boolean) => {
+      for (const el of els) el.style.willChange = on ? 'transform, opacity' : 'auto';
+    };
+
     // ---- Hero entrance timeline ----
     const hero = (sel: string) => document.querySelectorAll(`[data-hero="${sel}"]`);
-    const tl = anime.timeline({ easing: EASE, duration: 850 });
+    const heroEls = Array.from(document.querySelectorAll<HTMLElement>('[data-hero]'));
+    wc(heroEls, true);
+    const tl = anime.timeline({
+      easing: EASE,
+      duration: 850,
+      complete: () => wc(heroEls, false),
+    });
     tl.add({ targets: hero('eyebrow'), opacity: [0, 1], translateY: [18, 0], duration: 600 })
       .add(
         { targets: hero('line'), opacity: [0, 1], translateY: [40, 0], delay: anime.stagger(90), duration: 900 },
@@ -106,18 +120,21 @@ export function useLandingMotion(): void {
           if (!entry.isIntersecting) return;
           const el = entry.target as HTMLElement;
           revealIO.unobserve(el);
-          if (el.hasAttribute('data-reveal-group')) {
-            const items = el.querySelectorAll('[data-reveal]');
+          const reveal = (targets: HTMLElement | NodeListOf<Element>, extra: anime.AnimeParams) =>
             anime({
-              targets: items,
+              targets,
               opacity: [0, 1],
               translateY: [26, 0],
-              delay: anime.stagger(85),
               duration: 720,
               easing: 'easeOutCubic',
+              ...extra,
+              begin: (a) => a.animatables.forEach((x) => ((x.target as HTMLElement).style.willChange = 'transform, opacity')),
+              complete: (a) => a.animatables.forEach((x) => ((x.target as HTMLElement).style.willChange = 'auto')),
             });
+          if (el.hasAttribute('data-reveal-group')) {
+            reveal(el.querySelectorAll('[data-reveal]'), { delay: anime.stagger(85) });
           } else {
-            anime({ targets: el, opacity: [0, 1], translateY: [26, 0], duration: 720, easing: 'easeOutCubic' });
+            reveal(el, {});
           }
           el.querySelectorAll<HTMLElement>('[data-count]').forEach(runCount);
           if (el.hasAttribute('data-count')) runCount(el);
@@ -132,11 +149,28 @@ export function useLandingMotion(): void {
     // scroll), force everything visible after a grace period so content can
     // never get stranded at opacity 0 during a live demo.
     const safety = window.setTimeout(() => {
-      document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
+      document.querySelectorAll<HTMLElement>('[data-reveal], [data-hero]').forEach((el) => {
         if (getComputedStyle(el).opacity === '0') el.style.opacity = '1';
       });
     }, 6000);
     cleanups.push(() => window.clearTimeout(safety));
+
+    // ---- Pause the flow-line atmosphere while it's off-screen ----
+    // stroke-dashoffset can't be GPU-composited, so an always-on drift repaints
+    // every frame even when scrolled far past it. Freeze it when out of view.
+    const flowSvgs = new Set<Element>();
+    document.querySelectorAll('.flow-line').forEach((p) => {
+      const svg = p.closest('svg');
+      if (svg) flowSvgs.add(svg);
+    });
+    if (flowSvgs.size) {
+      const flowIO = new IntersectionObserver(
+        (entries) => entries.forEach((e) => (e.target as HTMLElement).classList.toggle('flow-paused', !e.isIntersecting)),
+        { rootMargin: '120px' },
+      );
+      flowSvgs.forEach((s) => flowIO.observe(s));
+      cleanups.push(() => flowIO.disconnect());
+    }
 
     // ---- Nav scroll-spy ----
     const links = Array.from(document.querySelectorAll<HTMLElement>('[data-navlink]'));
@@ -162,15 +196,36 @@ export function useLandingMotion(): void {
     const bar = document.querySelector<HTMLElement>('[data-progress]');
     if (bar) bar.style.transformOrigin = isArabic ? 'right center' : 'left center';
     const stickyNav = document.querySelector<HTMLElement>('[data-stickynav]');
-    const onScroll = () => {
+    // Coalesce scroll work into one rAF and only touch the DOM when a value
+    // actually changed - a raw per-event handler that reads layout + writes
+    // styles on every tick is the difference between 60fps and stutter.
+    let ticking = false;
+    let lastProgress = -1;
+    let lastSticky: boolean | null = null;
+    const applyScroll = () => {
+      ticking = false;
       const h = document.documentElement;
       if (bar) {
-        const p = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
-        bar.style.transform = `scaleX(${Math.min(1, Math.max(0, p))})`;
+        const p = Math.min(1, Math.max(0, h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight)));
+        if (Math.abs(p - lastProgress) > 0.001) {
+          bar.style.transform = `scaleX(${p})`;
+          lastProgress = p;
+        }
       }
-      if (stickyNav) stickyNav.classList.toggle('is-visible', h.scrollTop > window.innerHeight * 0.82);
+      if (stickyNav) {
+        const visible = h.scrollTop > window.innerHeight * 0.82;
+        if (visible !== lastSticky) {
+          stickyNav.classList.toggle('is-visible', visible);
+          lastSticky = visible;
+        }
+      }
     };
-    onScroll();
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(applyScroll);
+    };
+    applyScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     cleanups.push(() => window.removeEventListener('scroll', onScroll));
 

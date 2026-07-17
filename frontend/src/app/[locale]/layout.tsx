@@ -74,6 +74,16 @@ export default async function LocaleLayout({ children, params }: Props) {
       suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col bg-page-bg font-sans text-body-text antialiased">
+        {/* Flip the reveal gate on before first paint so scroll-reveal and hero
+            elements never flash visible before their entrance animation. Runs
+            synchronously here, ahead of <main>, so the gated content is hidden
+            the moment it paints; anime.js + globals.css own the reveal itself.
+            No JS -> this never runs -> everything stays visible (graceful). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('anim-ready')",
+          }}
+        />
         <NextIntlClientProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
             <a
