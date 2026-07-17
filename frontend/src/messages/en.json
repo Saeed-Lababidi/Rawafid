@@ -115,6 +115,30 @@
     }
   },
   "engine": {
+    "eyebrow": "The Rafid engine",
+    "title": "Transparent, explainable credit scoring",
+    "body": "The engine reads months of real sales across every aggregator and your open banking data to score creditworthiness in the open, with every factor shown. A living score that improves with each transaction.",
+    "features": {
+      "sales": {
+        "title": "Live sales data",
+        "body": "Volume and trend across all platforms, in real time."
+      },
+      "repayment": {
+        "title": "Repayment behaviour",
+        "body": "Consistency of repayment tracked with every sale."
+      },
+      "risk": {
+        "title": "Early risk detection",
+        "body": "Signals surface before a repayment ever stumbles."
+      }
+    },
+    "viz": {
+      "score": "A-",
+      "scoreLabel": "Creditworthiness score · ready to recommend",
+      "repayment": "Repayment consistency",
+      "growth": "Sales growth",
+      "stability": "Activity stability"
+    },
     "confidenceTitle": "Decision confidence",
     "confidenceHint": "How much data stands behind this assessment — separate from the score itself.",
     "confidenceBand": {
@@ -194,14 +218,14 @@
   "model": {
     "eyebrow": "Business model",
     "title": "Priced on your operations, never on your money",
-    "body": "Rafid subscriptions scale with operational volume, the number of sales we process, not with any financing amount. Charging on financing volume would be bay al-dayn, so we never do it. More sales means more work on our side, and that is the only thing our tiers are built on.",
-    "note": "Sharia-compliant by design: subscription tiers track sales volume, not financing value.",
+    "body": "Rafid subscriptions scale with operational volume, the number of sales we process, not with any financing amount. Charging on financing volume would be bay al-dayn, so we never do it. Financing is never a paid feature either: every tier can be underwritten by Alinma, on the same terms. More sales means more work on our side, and that is the only thing our tiers are built on.",
+    "note": "Sharia-compliant by design: tiers track sales volume, not financing value. Financing is open on every tier.",
     "tiers": {
       "starter": {
         "name": "Starter",
         "meta": "For a single shop",
         "priceLabel": "up to 1,000 orders / month",
-        "f1": "Unified sales dashboard",
+        "f1": "Unified sales dashboard, one platform",
         "f2": "Cashflow and settlement tracking",
         "f3": "Email support"
       },
@@ -210,15 +234,15 @@
         "meta": "Most popular",
         "priceLabel": "up to 10,000 orders / month",
         "f1": "Everything in Starter",
-        "f2": "Daily cashflow advance",
-        "f3": "Explainable credit score"
+        "f2": "Every sales platform connected",
+        "f3": "Exports and monthly reporting"
       },
       "scale": {
         "name": "Scale",
         "meta": "For multi-branch SMEs",
         "priceLabel": "unlimited orders",
         "f1": "Everything in Growth",
-        "f2": "Priority underwriting to Alinma",
+        "f2": "Multi-branch, multiple users",
         "f3": "Dedicated support"
       }
     }
