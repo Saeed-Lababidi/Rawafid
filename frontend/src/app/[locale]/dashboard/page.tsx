@@ -136,7 +136,7 @@ export default function DashboardPage() {
                   <Link
                     href="/financing"
                     locale={locale}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-pill bg-accent px-6 font-display text-body font-bold text-accent-foreground shadow-[0_12px_24px_-14px_rgba(195,107,78,0.9)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-pill bg-accent px-6 font-display text-body font-bold text-accent-foreground shadow-[0_12px_24px_-14px_rgba(195,107,78,0.9)]"
                   >
                     {t('getFinancing')}
                     <Arrow aria-hidden className="h-4 w-4" />
