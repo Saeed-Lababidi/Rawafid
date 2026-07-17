@@ -3,10 +3,8 @@
 ``assess(features) -> Decision`` and ``quote(basis, amount) -> Offer`` are the
 entire integration surface. Both are pure: no database, no network.
 
-A2 status: ``risk_score`` and ``credit_assessment`` are now REAL (transparent
-seven-factor scorecard). ``funding_recommendation``, ``confidence``,
-``explanation``, and the insight lists remain placeholders until A3–A5, so
-``assess`` still flags ``audit.stub = True`` until the full pipeline is live.
+Pipeline is complete: scorecard, confidence, decision gates, exposure/repayment,
+and bilingual explanation all run for real. ``audit.stub`` is always ``False``.
 """
 from __future__ import annotations
 
@@ -51,7 +49,7 @@ def assess(features: MerchantFeatures, audience: str = "merchant") -> Decision:
     conf = assess_confidence(features)
     outcome, decision_rules = evaluate_decision(card.score_850, conf.value, features)
     funding = _build_funding(outcome, card.grade, features)
-    story = build_explanation(features, card, outcome, funding, decision_rules, audience)
+    story = build_explanation(card, outcome, funding, decision_rules, audience)
 
     return Decision(
         engine_version=config.ENGINE_VERSION,

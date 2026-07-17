@@ -1,18 +1,25 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { LogOut } from 'lucide-react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import { clearTokens, getAccess, me } from '@/lib/api';
+import { clearTokens, getAccess, me, onAuthExpired } from '@/lib/api';
+import { qk } from '@/lib/query';
 import type { Role, UserOut } from '@/lib/types';
 import { Spinner } from '@/components/ui/primitives';
 import { RafidMark } from '@/components/rafid-mark';
 
 type NavItem = { href: string; label: string };
 
-// Client-side auth gate for every authed surface. Verifies the stored token
-// against /auth/me, enforces the expected role, and renders a compact sub-nav.
+/**
+ * Auth gate for every authed surface: resolves the session via /auth/me,
+ * enforces the expected role, and renders the sub-nav.
+ *
+ * This is UX routing, not security — the backend re-derives identity from the
+ * token on every request and owns the actual authorization decision.
+ */
 export function AppShell({
   role,
   nav,
@@ -26,33 +33,46 @@ export function AppShell({
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<UserOut | null>(null);
-  const [state, setState] = useState<'loading' | 'ok' | 'denied'>('loading');
+  const queryClient = useQueryClient();
+
+  const hasToken = typeof window !== 'undefined' && Boolean(getAccess());
+
+  const { data: user, isError } = useQuery({
+    queryKey: qk.me,
+    queryFn: me,
+    enabled: hasToken,
+    staleTime: 60_000,
+    retry: false,
+  });
+
+  // The transport layer clears tokens and fires this once when refresh fails
+  // terminally; it has no router access, so the redirect lands here.
+  useEffect(() => {
+    return onAuthExpired(() => {
+      queryClient.clear();
+      router.replace('/login');
+    });
+  }, [queryClient, router]);
 
   useEffect(() => {
-    if (!getAccess()) {
-      router.replace('/login');
-      return;
+    if (!hasToken || isError) router.replace('/login');
+  }, [hasToken, isError, router]);
+
+  // Wrong surface for this role: send the user to their own home rather than
+  // showing a 403 they can do nothing about.
+  useEffect(() => {
+    if (user && user.role !== role) {
+      router.replace(user.role === 'bank_admin' ? '/admin' : '/dashboard');
     }
-    me()
-      .then((u) => {
-        if (u.role !== role) {
-          setState('denied');
-          router.replace(u.role === 'bank_admin' ? '/admin' : '/dashboard');
-          return;
-        }
-        setUser(u);
-        setState('ok');
-      })
-      .catch(() => router.replace('/login'));
-  }, [role, router]);
+  }, [user, role, router]);
 
   function logout() {
     clearTokens();
+    queryClient.clear();
     router.replace('/login');
   }
 
-  if (state !== 'ok' || !user) {
+  if (!user || user.role !== role) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <Spinner className="h-7 w-7" />

@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link, useRouter } from '@/i18n/navigation';
 import { ApiError, login, roleFromToken, setTokens } from '@/lib/api';
 import { Alert, Button } from '@/components/ui/primitives';
 import { RafidMark } from '@/components/rafid-mark';
@@ -19,23 +20,35 @@ export default function LoginPage() {
   const tBrand = useTranslations('brand');
   const tHero = useTranslations('hero');
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
-  async function submit(withEmail: string, withPassword: string, tag: string) {
-    setError(null);
-    setBusy(tag);
-    try {
-      const pair = await login(withEmail, withPassword);
+  const loginM = useMutation({
+    mutationFn: ({ email: e, password: p }: { email: string; password: string }) => login(e, p),
+    onSuccess: (pair) => {
       setTokens(pair);
+      // Drop any cache belonging to a previously signed-in account before the
+      // new surface mounts and starts reading it.
+      queryClient.clear();
       const role = roleFromToken(pair.access_token);
       router.replace(role === 'bank_admin' ? '/admin' : '/dashboard');
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : t('genericError'));
+    },
+    onError: (e) => {
+      // 401 here means bad credentials — the backend's `detail` is presentable.
+      // Anything else (500, network) gets the translated fallback.
+      const presentable = e instanceof ApiError && e.status < 500;
+      setError(presentable ? e.message : t('genericError'));
       setBusy(null);
-    }
+    },
+  });
+
+  function submit(withEmail: string, withPassword: string, tag: string) {
+    setError(null);
+    setBusy(tag);
+    loginM.mutate({ email: withEmail, password: withPassword });
   }
 
   const inputClass =
@@ -118,6 +131,13 @@ export default function LoginPage() {
               {t('signIn')}
             </Button>
           </form>
+
+          <p className="text-center text-meta text-body-text-muted">
+            {t('noAccount')}{' '}
+            <Link href="/register" className="font-bold text-accent hover:underline">
+              {t('createAccount')}
+            </Link>
+          </p>
 
           <div className="flex flex-col gap-3">
             <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-text">
