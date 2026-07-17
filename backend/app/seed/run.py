@@ -20,7 +20,8 @@ from app.domain.enums import ConnectionType, UserRole
 from app.domain.models import Merchant, User
 from app.security.auth import hash_password
 from app.seed.synthetic import profile_for
-from app.services import onboarding
+from app.services import offers as offers_service
+from app.services import onboarding, scoring
 from app.services.aggregation import aggregate_merchant
 
 ADMIN_EMAIL = "admin@rafid.sa"
@@ -56,7 +57,10 @@ async def seed(reset: bool) -> None:
             await session.commit()
             print(f"admin created: {ADMIN_EMAIL} / {ADMIN_PASSWORD}")
 
-        print(f"{'merchant':<20} {'email':<26} {'platforms':<18} {'bank':<14} risky")
+        print(
+            f"{'merchant':<20} {'email':<26} {'platforms':<34} "
+            f"{'bank':<14} {'risk':<4} {'bnd':<3} {'scr':<4} {'stage':<9}"
+        )
         for i, name in enumerate(MERCHANT_NAMES, start=1):
             email = f"merchant{i:02d}@rafid.sa"
             if await session.scalar(select(User).where(User.email == email)):
@@ -68,8 +72,7 @@ async def seed(reset: bool) -> None:
             merchant = Merchant(
                 id=merchant_id,
                 name=name,
-                business_type="food" if set(profile.platforms) & {"jahez", "foodics"}
-                else "ecommerce",
+                business_type=profile.sector,
                 established_at=date.today() - timedelta(days=profile.account_age_days),
             )
             session.add(merchant)
@@ -97,9 +100,40 @@ async def seed(reset: bool) -> None:
                 )
 
             summary = await aggregate_merchant(session, merchant, actor_user_id=user.id)
+
+            # Score every merchant so the underwriter portfolio is populated
+            # (risk bands, distribution donut, "scored" funnel stage). Then take
+            # a realistic slice down the funnel: approved merchants receive an
+            # offer, and roughly every other one accepts it into an active
+            # Murabaha contract — so the funnel and contract KPIs aren't empty.
+            try:
+                assessment = await scoring.run_assessment(
+                    session, merchant, actor_user_id=user.id
+                )
+            except scoring.ScoringError:
+                assessment = None
+
+            stage = "scored" if assessment else "-"
+            if assessment and assessment.approved:
+                try:
+                    offer = await offers_service.generate_offer(
+                        session, merchant, actor_user_id=user.id
+                    )
+                    stage = "offered"
+                    if i % 2 == 0:
+                        await offers_service.accept_offer(
+                            session, merchant, offer.id, actor_user_id=user.id
+                        )
+                        stage = "accepted"
+                except offers_service.OfferError:
+                    pass
+
+            band = assessment.risk_band if assessment else "--"
+            score = assessment.score if assessment else 0
             print(
-                f"{name:<20} {email:<26} {','.join(profile.platforms):<18} "
-                f"{profile.bank:<14} {'YES' if profile.risky else '-'}   "
+                f"{name:<20} {email:<26} {','.join(profile.platforms):<34} "
+                f"{profile.bank:<14} {'YES' if profile.risky else '-':<4} "
+                f"{band:<3} {score:<4} {stage:<9} "
                 f"(held {summary.held_receivables_total:,.0f} SAR)"
             )
 

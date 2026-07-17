@@ -12,9 +12,14 @@ import type { PlatformSummary } from '@/lib/sales';
 
 // Each aggregator gets a stable colour so a platform reads the same everywhere.
 const PLATFORM_COLOR: Record<string, string> = {
+  // retail
   salla: 'var(--color-brand-terra)',
   zid: 'var(--color-brand-purple)',
+  noon: '#d99a2b',
+  // food
   jahez: 'var(--color-risk-a)',
+  hungerstation: '#e2703a',
+  mrsool: '#0ea5a0',
   foodics: '#5b8ac2',
 };
 

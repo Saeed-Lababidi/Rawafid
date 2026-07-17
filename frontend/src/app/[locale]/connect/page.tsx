@@ -31,7 +31,7 @@ import type { AggregateResponse, ConsentStartResponse } from '@/lib/types';
 
 // From app/providers/base.py — the backend rejects anything else with a 400.
 const BANKS = ['alinma', 'alrajhi_synth', 'riyad_synth'] as const;
-const PLATFORMS = ['salla', 'zid', 'jahez', 'foodics'] as const;
+const PLATFORMS = ['salla', 'zid', 'noon', 'jahez', 'hungerstation', 'mrsool', 'foodics'] as const;
 
 type Stage = 'bank' | 'sales' | 'aggregate' | 'done';
 

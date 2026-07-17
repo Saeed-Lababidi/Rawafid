@@ -345,7 +345,10 @@
     "platforms": {
       "salla": "Salla",
       "zid": "Zid",
+      "noon": "noon",
       "jahez": "Jahez",
+      "hungerstation": "HungerStation",
+      "mrsool": "Mrsool",
       "foodics": "Foodics"
     },
     "status": {
@@ -523,6 +526,10 @@
     "activeContracts": "Active contracts",
     "disbursed": "Total disbursed",
     "outstanding": "Total outstanding",
+    "portfolioSales": "Portfolio sales (90d)",
+    "portfolioSalesHint": "Confirmed sales across every connected merchant and aggregator.",
+    "heldReceivables": "Held receivables",
+    "heldReceivablesHint": "Confirmed earnings still locked behind the aggregators, portfolio-wide.",
     "funnelTitle": "Origination funnel",
     "funnel": {
       "registered": "Registered",
@@ -539,6 +546,15 @@
     "merchantsTitle": "Merchants",
     "verified": "Verified",
     "merchantsHint": "Open any merchant to see the full underwriting file.",
+    "colMerchant": "Merchant",
+    "colChannels": "Channels",
+    "colVolume": "Sales (90d)",
+    "colHeld": "Held",
+    "colRisk": "Risk",
+    "merchantScore": "Score {score}",
+    "notScored": "Not scored yet",
+    "channelsCount": "{count, plural, one {# channel} other {# channels}}",
+    "alertsCount": "{count, plural, one {# alert} other {# alerts}}",
     "expectedReturn": "Bank's expected return",
     "expectedReturnHint": "Alinma's disclosed Murabaha profit and fees across the financing book. This is the bank's return, not Rafid's revenue."
   },

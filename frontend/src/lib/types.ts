@@ -32,6 +32,19 @@ export interface MerchantOut {
   established_at: string;
 }
 
+/** Enriched merchant row for the underwriter portfolio table (`/admin/merchants`). */
+export interface AdminMerchantOut extends MerchantOut {
+  score: number | null;
+  risk_band: RiskBand | null;
+  approved: boolean | null;
+  platforms: string[];
+  platform_count: number;
+  sales_volume: number;
+  held_receivables: number;
+  outstanding: number;
+  open_alerts: number;
+}
+
 export interface ConsentStartResponse {
   session_id: string;
   authorize_url: string;
