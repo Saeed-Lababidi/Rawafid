@@ -9,6 +9,7 @@ import { clearTokens, getAccess, me, onAuthExpired } from '@/lib/api';
 import { qk } from '@/lib/query';
 import type { Role, UserOut } from '@/lib/types';
 import { Spinner } from '@/components/ui/primitives';
+import { RafidMark } from '@/components/rafid-mark';
 
 type NavItem = { href: string; label: string };
 
@@ -83,6 +84,9 @@ export function AppShell({
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline pb-4">
         <nav className="flex flex-wrap items-center gap-1">
+          <span className="me-2 flex items-center gap-2 font-display text-body font-bold text-brand-navy dark:text-brand-cream">
+            <RafidMark className="h-5 w-7" />
+          </span>
           {nav.map((item) => {
             const active = pathname === item.href;
             return (

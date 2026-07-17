@@ -5,7 +5,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { FastForward } from 'lucide-react';
 import { AppShell } from '@/components/app/app-shell';
-import { Button, Card, Chip, StatTile } from '@/components/ui/primitives';
+import { Button, Card, CardHeading, Chip, StatTile } from '@/components/ui/primitives';
+import { IconGrowth, IconRiskShield, IconSME } from '@/components/brand-icons';
 import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { bandColor, Donut, FunnelBars } from '@/components/ui/charts';
 import { useToast } from '@/components/providers/toast-provider';
@@ -91,8 +92,8 @@ export default function AdminPage() {
           <div className="flex flex-col gap-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-col gap-1">
-                <span className="text-meta text-muted-text">{t('subtitle')}</span>
-                <h1 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">{t('title')}</h1>
+                <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-text">{t('subtitle')}</span>
+                <h1 className="font-display text-h1 font-bold text-brand-navy dark:text-brand-cream">{t('title')}</h1>
               </div>
               <div className="flex items-center gap-3">
                 {simDate ? (
@@ -130,7 +131,7 @@ export default function AdminPage() {
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Funnel */}
               <Card className="flex flex-col gap-4">
-                <h2 className="text-body font-bold text-body-text">{t('funnelTitle')}</h2>
+                <CardHeading icon={<IconGrowth className="h-5 w-5" />}>{t('funnelTitle')}</CardHeading>
                 <FunnelBars
                   stages={[
                     { label: t('funnel.registered'), value: portfolio.funnel.registered },
@@ -144,7 +145,7 @@ export default function AdminPage() {
 
               {/* Risk distribution */}
               <Card className="flex flex-col gap-4">
-                <h2 className="text-body font-bold text-body-text">{t('riskTitle')}</h2>
+                <CardHeading icon={<IconRiskShield className="h-5 w-5" />}>{t('riskTitle')}</CardHeading>
                 <div className="flex items-center gap-6">
                   <Donut
                     data={BANDS.map((b) => ({ key: b, value: portfolio.risk_distribution[b] ?? 0 })).filter(
@@ -174,7 +175,7 @@ export default function AdminPage() {
             {/* Alerts */}
             <Card className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-body font-bold text-body-text">{t('alertsTitle')}</h2>
+                <CardHeading icon={<IconRiskShield className="h-5 w-5" />}>{t('alertsTitle')}</CardHeading>
                 <Chip tone={portfolio.open_alerts > 0 ? 'warn' : 'good'}>
                   {t('openAlerts', { count: portfolio.open_alerts })}
                 </Chip>
@@ -208,7 +209,7 @@ export default function AdminPage() {
 
             {/* Merchant list */}
             <Card className="flex flex-col gap-4">
-              <h2 className="text-body font-bold text-body-text">{t('merchantsTitle')}</h2>
+              <CardHeading icon={<IconSME className="h-5 w-5" />}>{t('merchantsTitle')}</CardHeading>
               <div className="flex flex-col divide-y divide-hairline">
                 {merchants.map((m) => (
                   <div key={m.id} className="flex items-center justify-between py-2.5">

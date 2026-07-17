@@ -1,5 +1,5 @@
 // THE single entry point for number / currency / date formatting across Rafid
-// (D-16, FOUND-05). Every server-provided figure is FORMATTED here — this
+// (D-16, FOUND-05). Every server-provided figure is FORMATTED here - this
 // module performs NO financial arithmetic (no score, fee, profit, or
 // days-remaining is computed or derived here; those values arrive already
 // calculated from the backend and are only rendered).
@@ -19,8 +19,8 @@
 
 export type Locale = 'ar' | 'en';
 
-// Fixed placeholder for absent values — never render 'NaN' or 'Invalid Date'.
-const PLACEHOLDER = '—';
+// Fixed placeholder for absent values - never render 'NaN' or 'Invalid Date'.
+const PLACEHOLDER = '-';
 
 const numberLocale = (locale: Locale): string =>
   locale === 'ar' ? 'ar-SA-u-nu-latn' : 'en-US';

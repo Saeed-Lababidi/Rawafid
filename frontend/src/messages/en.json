@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "Rafid",
-    "tagline": "Smart financing for your business, built on your data"
+    "tagline": "One live view of every sale, across every platform"
   },
   "nav": {
     "languageToggle": "عربي",
@@ -9,37 +9,180 @@
     "themeToggleToDark": "Switch to dark mode",
     "themeToggleToLight": "Switch to light mode",
     "skipToContent": "Skip to content",
-    "signIn": "Sign in"
-  },
-  "hero": {
-    "headline": "Smart financing for your business, built on your data",
-    "subheadline": "Connect your bank and sales platforms and receive Sharia-compliant Murabaha funding against your confirmed receivables — with a transparent, explainable credit assessment.",
-    "cta": "How Rafid works",
-    "ctaPrimary": "Get started"
-  },
-  "howItWorks": {
-    "title": "How Rafid works",
-    "step1": {
-      "title": "Connect your accounts",
-      "body": "Rafid aggregates 90 days of your bank and sales-platform data via open banking, with your consent."
-    },
-    "step2": {
-      "title": "Transparent credit score",
-      "body": "The Rafid engine scores your creditworthiness with a transparent, explainable model — with clear reasons behind every decision."
-    },
-    "step3": {
-      "title": "Murabaha that repays itself",
-      "body": "Receive Murabaha cash against your confirmed receivables, with repayment auto-collected from your incoming settlements."
+    "signIn": "Sign in",
+    "getStarted": "Get started",
+    "sections": {
+      "problem": "Problem",
+      "solution": "Solution",
+      "platform": "Platform",
+      "alinma": "For Alinma",
+      "model": "Pricing"
     }
   },
+  "hero": {
+    "tag": "Rafid platform",
+    "headline1": "Every sale.",
+    "headline2": "Every platform.",
+    "headline3": "One live view.",
+    "subheadline": "Rafid unifies your orders and cashflow from every delivery and e-commerce platform into a single live dashboard. See exactly what you earn and when it lands, and unlock the cash locked behind the aggregators whenever you need it.",
+    "ctaPrimary": "Get started",
+    "cta": "See how it works",
+    "scrollCue": "Scroll",
+    "meta": {
+      "builtForLabel": "Built for",
+      "builtForValue": "Alinma Hackathon",
+      "categoryLabel": "Category",
+      "categoryValue": "Open Banking · SME",
+      "modelLabel": "Compliance",
+      "modelValue": "Sharia-compliant by design"
+    },
+    "quote": {
+      "kicker": "One dashboard for every platform",
+      "body": "I finally see all my delivery and store orders in one place, and my locked earnings reach me the day I need them instead of two weeks later.",
+      "attribution": "Cafe owner, Riyadh"
+    }
+  },
+  "problem": {
+    "eyebrow": "The problem",
+    "title": "Vision 2030 wants banks financing far more small businesses. Assessing them is the blocker.",
+    "body": "Saudi small and medium businesses drive the economy, yet only a fraction can access bank financing. The barrier is not appetite, it is visibility: a merchant's real sales are scattered across delivery and e-commerce aggregators, and their earnings sit locked for weeks. Banks like Alinma cannot easily see who is creditworthy, so they underwrite far fewer SMEs than the Vision 2030 target.",
+    "stats": {
+      "target": { "value": "20", "suffix": "%", "label": "Vision 2030 target for the SME share of bank financing" },
+      "actual": { "value": "9", "suffix": "%", "label": "Roughly where big banks sit today, about halfway there" },
+      "locked": { "value": "14", "suffix": " days", "label": "How long a merchant's earnings stay locked behind the aggregators" }
+    },
+    "note": "Figures are illustrative for the demo, pending licensed market data."
+  },
+  "solution": {
+    "eyebrow": "The solution",
+    "title": "A platform that works both ways",
+    "body": "Rafid is software powered by an AI engine that reads a merchant's sales across every aggregator, together with open banking data, to understand the business. Merchants get one unified view of their cashflow and the option to draw their locked earnings early. Alinma gets a clear, evidence-based read on which SMEs are ready to underwrite.",
+    "sme": {
+      "title": "For the merchant",
+      "body": "A single dashboard for every platform, plus daily cashflow on demand so day to day operations never stall waiting on aggregator payouts."
+    },
+    "bank": {
+      "title": "For Alinma",
+      "body": "A living, data-backed picture of each merchant's real sales and repayment behaviour, turning invisible SMEs into a qualified underwriting pipeline."
+    },
+    "diagram": {
+      "sourcesTitle": "Your sales platforms",
+      "sourcesSub": "Delivery · e-commerce · in-store",
+      "src1": "Delivery",
+      "src2": "E-commerce",
+      "src3": "In-store",
+      "hubTitle": "Rafid",
+      "hubSub": "Unified data + AI engine",
+      "out1Title": "For merchants",
+      "out1Sub": "Live dashboard + daily cashflow",
+      "out2Title": "For Alinma",
+      "out2Sub": "Underwriting-ready SMEs"
+    }
+  },
+  "platform": {
+    "eyebrow": "The platform",
+    "title": "Monitor your business first. Finance it when you choose.",
+    "body": "The dashboard is the product. Financing is one feature inside it.",
+    "features": {
+      "unified": {
+        "title": "Unified sales view",
+        "body": "Every order from every delivery and e-commerce platform, merged into one live feed with trends and totals."
+      },
+      "cashflow": {
+        "title": "Cashflow and settlements",
+        "body": "See exactly how much is held by each aggregator and the day it is scheduled to release."
+      },
+      "advance": {
+        "title": "Daily cashflow, on demand",
+        "body": "An optional feature: draw your confirmed earnings early instead of waiting weeks, and repay automatically with each sale."
+      },
+      "record": {
+        "title": "Your credit record",
+        "body": "Real behaviour builds a credit history that opens the door to Alinma financing as you grow."
+      }
+    }
+  },
+  "engine": {
+    "eyebrow": "The Rafid engine",
+    "title": "Transparent, explainable credit scoring",
+    "body": "The engine reads months of real sales across every aggregator and your open banking data to score creditworthiness in the open, with every factor shown. A living score that improves with each transaction.",
+    "features": {
+      "sales": { "title": "Live sales data", "body": "Volume and trend across all platforms, in real time." },
+      "repayment": { "title": "Repayment behaviour", "body": "Consistency of repayment tracked with every sale." },
+      "risk": { "title": "Early risk detection", "body": "Signals surface before a repayment ever stumbles." }
+    },
+    "viz": {
+      "score": "A-",
+      "scoreLabel": "Creditworthiness score · ready to recommend",
+      "repayment": "Repayment consistency",
+      "growth": "Sales growth",
+      "stability": "Activity stability"
+    }
+  },
+  "product": {
+    "eyebrow": "The product",
+    "title": "One platform, four views",
+    "body": "The same unified data, shown for whoever is looking, from the merchant floor to the underwriter's desk.",
+    "screens": {
+      "dashboard": { "title": "Merchant dashboard", "body": "Unified sales, held receivables and cashflow in one place." },
+      "financing": { "title": "Financing", "body": "The optional cash advance offer and its repayment schedule." },
+      "engine": { "title": "Explainable score", "body": "The credit score with every contributing factor shown." },
+      "bank": { "title": "Bank view", "body": "Qualified SMEs and their scores, ready for Alinma." }
+    },
+    "showcase": {
+      "badge": "Working capital line",
+      "amount": "SAR 250,000",
+      "available": "available",
+      "profitLabel": "Profit rate",
+      "profitValue": "Sharia-compliant",
+      "drawnLabel": "Drawn",
+      "drawnValue": "SAR 90,000",
+      "reviewLabel": "Next review",
+      "reviewValue": "Mar 2027",
+      "stat1Label": "Repayment", "stat1Value": "92%",
+      "stat2Label": "Growth", "stat2Value": "78%",
+      "stat3Label": "Stability", "stat3Value": "85%"
+    }
+  },
+  "forAlinma": {
+    "eyebrow": "For Alinma and banks",
+    "title": "A ready pipeline of qualified SMEs",
+    "body": "Instead of hunting for clients, Alinma receives a stream of businesses that have already proven themselves through real behaviour, each with an actionable credit score attached. Rafid lowers underwriting risk and moves the SME financing share toward the Vision 2030 target.",
+    "cta": "Get in touch",
+    "points": {
+      "p1": "Pre-qualified businesses, not cold leads.",
+      "p2": "Credit scores built on real, verified behaviour.",
+      "p3": "Lower underwriting risk and acquisition cost.",
+      "p4": "Direct progress toward the 2030 SME financing target."
+    }
+  },
+  "model": {
+    "eyebrow": "Business model",
+    "title": "Priced on your operations, never on your money",
+    "body": "Rafid subscriptions scale with operational volume, the number of sales we process, not with any financing amount. Charging on financing volume would be bay al-dayn, so we never do it. More sales means more work on our side, and that is the only thing our tiers are built on.",
+    "note": "Sharia-compliant by design: subscription tiers track sales volume, not financing value.",
+    "tiers": {
+      "starter": { "name": "Starter", "meta": "For a single shop", "priceLabel": "up to 1,000 orders / month", "f1": "Unified sales dashboard", "f2": "Cashflow and settlement tracking", "f3": "Email support" },
+      "growth": { "name": "Growth", "meta": "Most popular", "priceLabel": "up to 10,000 orders / month", "f1": "Everything in Starter", "f2": "Daily cashflow advance", "f3": "Explainable credit score" },
+      "scale": { "name": "Scale", "meta": "For multi-branch SMEs", "priceLabel": "unlimited orders", "f1": "Everything in Growth", "f2": "Priority underwriting to Alinma", "f3": "Dedicated support" }
+    }
+  },
+  "finalCta": {
+    "title": "See every sale in one place. Starting today.",
+    "subtitle": "Join as a merchant, connect your platforms, and watch your cashflow come together in minutes.",
+    "cta": "Get started"
+  },
+  "footer": {
+    "note": "Built for the Alinma Hackathon · 2026"
+  },
   "health": {
-    "checking": "Checking…",
+    "checking": "Checking",
     "live": "Live",
     "offline": "Offline",
-    "offlineTooltip": "Can't reach the server, retrying…"
+    "offlineTooltip": "Can't reach the server, retrying"
   },
   "disclaimer": {
-    "text": "Demo dataset for presentation purposes only — not real bank accounts."
+    "text": "Demo dataset for presentation purposes only. Not real bank accounts."
   },
   "app": {
     "logout": "Sign out",
@@ -185,15 +328,16 @@
     "createAccount": "Create one",
     "demoLabel": "Or jump straight into a demo account",
     "demo": {
-      "merchantHealthy": { "name": "Healthy merchant", "desc": "TechSouq — strong receivables, happy path" },
-      "merchantRisky": { "name": "At-risk merchant", "desc": "Amber Cosmetics — revenue drop & delays" },
-      "admin": { "name": "Bank underwriter", "desc": "Portfolio & risk dashboard" }
+      "merchantHealthy": { "name": "Healthy merchant", "desc": "TechSouq, strong receivables, happy path" },
+      "merchantRisky": { "name": "At-risk merchant", "desc": "Amber Cosmetics, revenue drop and delays" },
+      "admin": { "name": "Bank underwriter", "desc": "Portfolio and risk dashboard" }
     }
   },
   "dashboard": {
     "greeting": "Welcome back",
+    "heldBadge": "Held receivables",
     "heldReceivables": "Confirmed receivables held by platforms",
-    "heldHint": "Cash you can unlock today — financing is a percentage of this amount.",
+    "heldHint": "Cash you can unlock today. Financing is a percentage of this amount.",
     "getFinancing": "Get financing",
     "activeOutstanding": "Outstanding balance",
     "activeContract": "Active Murabaha contract",
@@ -206,20 +350,20 @@
     "onboardTitle": "Connect your accounts to begin",
     "onboardBody": "Rafid needs your bank and sales data before it can assess you. It takes about a minute.",
     "onboardCta": "Connect accounts",
-    "revenueTitle": "Daily revenue — last 90 days",
+    "revenueTitle": "Daily revenue, last 90 days",
     "revenueHint": "Completed orders across all connected sales platforms.",
     "upcomingSettlements": "Upcoming settlements",
     "delayed": "Delayed",
     "noSettlements": "No pending settlements.",
     "alertsTitle": "Alerts",
-    "noAlerts": "No alerts — all clear.",
+    "noAlerts": "No alerts, all clear.",
     "severity": { "low": "Low", "medium": "Medium", "high": "High" }
   },
   "financing": {
     "title": "Financing",
     "error": "Something went wrong. Try again.",
     "introTitle": "Unlock cash against your receivables",
-    "introBody": "Run a transparent credit assessment on your 90 days of connected data. It takes a second, and you'll see exactly what drives the decision.",
+    "introBody": "Run a transparent credit assessment on your 90 days of connected data. It takes a second, and you will see exactly what drives the decision.",
     "runAssessment": "Run credit assessment",
     "yourScore": "Your credit score",
     "approvedUpTo": "Approved for up to {amount}",
@@ -233,7 +377,7 @@
     "offerCash": "Cash advance today",
     "advanceRatio": "{pct}% of your confirmed receivables",
     "costBreakdown": "Cost breakdown",
-    "murabahaNote": "Sharia-compliant Murabaha — the bank buys at cost and sells at cost plus a disclosed profit. No interest.",
+    "murabahaNote": "Sharia-compliant Murabaha. The bank buys at cost and sells at cost plus a disclosed profit. No interest.",
     "offer": {
       "principal": "Cash advance (cost price)",
       "profitAmount": "Disclosed profit",
@@ -243,7 +387,7 @@
     },
     "underwriterNote": "Underwriter note",
     "expires": "Offer valid until {date}",
-    "acceptOffer": "Accept & receive cash",
+    "acceptOffer": "Accept and receive cash",
     "rejectOffer": "Not now",
     "outstanding": "Outstanding balance",
     "statusActive": "Active",

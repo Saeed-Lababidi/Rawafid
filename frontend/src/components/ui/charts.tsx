@@ -1,6 +1,6 @@
 'use client';
 
-// Lightweight hand-rolled SVG charts — no charting dependency. Every chart is
+// Lightweight hand-rolled SVG charts - no charting dependency. Every chart is
 // purely presentational: it renders values the backend already computed and
 // performs no financial arithmetic of its own (D-16), only min/max scaling.
 
@@ -33,7 +33,7 @@ export function AreaChart({ points }: { points: { label: string; value: number }
   );
 }
 
-// Horizontal signed bars — feature contributions to a credit score. Positive
+// Horizontal signed bars - feature contributions to a credit score. Positive
 // contributions render terra/accent, negative render destructive-red.
 export function ContributionBars({
   items,
@@ -179,7 +179,7 @@ export function Donut({ data }: { data: { key: string; value: number }[] }) {
 
 export const bandColor = (band: string): string => BAND_COLOR[band] ?? 'var(--color-muted-text)';
 
-// Horizontal funnel bars — each stage width proportional to the top stage.
+// Horizontal funnel bars - each stage width proportional to the top stage.
 export function FunnelBars({ stages }: { stages: { label: string; value: number }[] }) {
   const max = Math.max(...stages.map((s) => s.value), 1);
   return (

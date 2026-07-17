@@ -39,9 +39,9 @@ export function StatTile({
           : 'border-card-border bg-card'
       }`}
     >
-      <span className="text-meta text-muted-text">{label}</span>
+      <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-text">{label}</span>
       <span
-        className={`text-h1 font-bold ${accent ? 'text-accent' : 'text-brand-navy dark:text-brand-cream'}`}
+        className={`font-display text-h1 font-bold ${accent ? 'text-accent' : 'text-brand-navy dark:text-brand-cream'}`}
       >
         <bdi>{value}</bdi>
       </span>
@@ -94,9 +94,9 @@ export function Button({
   className?: string;
 }) {
   const base =
-    'inline-flex h-11 items-center justify-center gap-2 rounded-pill px-6 text-body font-bold transition-all disabled:cursor-not-allowed disabled:opacity-50';
+    'inline-flex h-11 items-center justify-center gap-2 rounded-pill px-6 font-display text-body font-bold transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0';
   const styles = {
-    primary: 'bg-accent text-accent-foreground hover:opacity-90',
+    primary: 'bg-accent text-accent-foreground shadow-[0_12px_24px_-14px_rgba(195,107,78,0.9)] hover:opacity-95',
     secondary: 'border border-hairline-strong bg-card text-body-text hover:border-accent hover:text-accent',
     ghost: 'text-body-text-muted hover:text-accent',
   }[variant];
@@ -131,7 +131,18 @@ export function ProgressBar({ value }: { value: number }) {
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">{children}</h2>
+    <h2 className="font-display text-h1 font-bold text-brand-navy dark:text-brand-cream">{children}</h2>
+  );
+}
+
+// Card-level heading with a small brand-icon slot - the app-side echo of the
+// landing eyebrow, keeps section headers recognisably Rafid.
+export function CardHeading({ icon, children }: { icon?: ReactNode; children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-2">
+      {icon ? <span className="text-accent">{icon}</span> : null}
+      <h2 className="text-body font-bold text-body-text">{children}</h2>
+    </div>
   );
 }
 

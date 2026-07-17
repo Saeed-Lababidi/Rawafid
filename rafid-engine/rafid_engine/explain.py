@@ -22,12 +22,9 @@ from .schema import (
     FundingRecommendation,
     Insight,
     Localized,
-    MerchantFeatures,
     NextStep,
     Outcome,
 )
-
-STRENGTH_THRESHOLD = 0.75  # sub-score at/above which a factor is a genuine strength
 
 # factor -> (strength reason code, weakness reason code)
 _REASON_CODES: dict[str, tuple[str, str]] = {
@@ -106,15 +103,17 @@ class ExplanationBundle:
     next_steps: list[NextStep]
 
 
-def _impact(factor: FactorContribution, target: float = 0.90) -> int:
+def _impact(factor: FactorContribution, target: float | None = None) -> int:
     """Score points unlocked if this factor improved to `target` — grounded in the math."""
+    target = config.EXPLAIN.impact_target if target is None else target
     headroom = max(0.0, target - factor.sub_score)
     return max(1, round(factor.weight * headroom * config.SCORE_SPAN))
 
 
 def _insights(card: ScorecardResult) -> tuple[list[Insight], list[Insight], list[NextStep]]:
-    strong = [f for f in card.factors if f.sub_score >= STRENGTH_THRESHOLD]
-    weak = [f for f in card.factors if f.sub_score < STRENGTH_THRESHOLD]
+    threshold = config.EXPLAIN.strength_threshold
+    strong = [f for f in card.factors if f.sub_score >= threshold]
+    weak = [f for f in card.factors if f.sub_score < threshold]
     strong.sort(key=lambda f: f.contribution_pct, reverse=True)
     weak.sort(key=lambda f: f.sub_score)
 
@@ -140,7 +139,6 @@ def _insights(card: ScorecardResult) -> tuple[list[Insight], list[Insight], list
 def _summary(
     audience: str,
     outcome: Outcome,
-    features: MerchantFeatures,
     card: ScorecardResult,
     funding: FundingRecommendation,
     decision_rules: list[str],
@@ -183,7 +181,6 @@ def _summary(
 
 
 def build_explanation(
-    features: MerchantFeatures,
     card: ScorecardResult,
     outcome: Outcome,
     funding: FundingRecommendation,
@@ -191,7 +188,7 @@ def build_explanation(
     audience: str = "merchant",
 ) -> ExplanationBundle:
     strengths, weaknesses, next_steps = _insights(card)
-    summary = _summary(audience, outcome, features, card, funding, decision_rules, strengths)
+    summary = _summary(audience, outcome, card, funding, decision_rules, strengths)
     return ExplanationBundle(
         summary=summary,
         strengths=strengths,

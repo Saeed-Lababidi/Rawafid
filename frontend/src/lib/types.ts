@@ -1,4 +1,4 @@
-// API payload types — mirrors the backend OpenAPI spec (FRONTEND_GUIDE §11).
+// API payload types - mirrors the backend OpenAPI spec (FRONTEND_GUIDE §11).
 // These are render contracts only; no arithmetic is derived from them here.
 
 export type Role = 'merchant' | 'bank_admin';

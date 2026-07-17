@@ -2,10 +2,12 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useQueries } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, PlugZap, TrendingUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, PlugZap } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { AppShell } from '@/components/app/app-shell';
-import { Card, Chip, StatTile } from '@/components/ui/primitives';
+import { Card, CardHeading, Chip } from '@/components/ui/primitives';
+import { FinCard } from '@/components/brand';
+import { IconCashflow, IconGrowth, IconRiskShield } from '@/components/brand-icons';
 import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { AreaChart } from '@/components/ui/charts';
 import {
@@ -119,8 +121,8 @@ export default function DashboardPage() {
         >
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1">
-              <span className="text-meta text-muted-text">{t('greeting')}</span>
-              <h1 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-text">{t('greeting')}</span>
+              <h1 className="font-display text-h1 font-bold text-brand-navy dark:text-brand-cream">
                 <bdi>{merchant?.name}</bdi>
               </h1>
             </div>
@@ -131,7 +133,7 @@ export default function DashboardPage() {
                   <PlugZap aria-hidden className="h-8 w-8 text-accent" />
                 </div>
                 <div className="flex max-w-md flex-col gap-2">
-                  <h2 className="text-h1 font-bold text-brand-navy dark:text-brand-cream">
+                  <h2 className="font-display text-h1 font-bold text-brand-navy dark:text-brand-cream">
                     {t('onboardTitle')}
                   </h2>
                   <p className="text-body text-body-text-muted">{t('onboardBody')}</p>
@@ -147,50 +149,39 @@ export default function DashboardPage() {
               </Card>
             ) : (
               <>
-            {/* Hero: held receivables + financing CTA */}
-            <Card className="flex flex-col gap-5 border-accent/30 bg-gradient-to-br from-accent/10 to-transparent sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-col gap-1.5">
-                <span className="text-meta text-body-text-muted">{t('heldReceivables')}</span>
-                <span className="text-display font-bold text-accent">
-                  <bdi>{formatCurrency(held, locale)}</bdi>
-                </span>
-                <span className="max-w-md text-meta text-body-text-muted">{t('heldHint')}</span>
-              </div>
-              <Link
-                href="/financing"
-                locale={locale}
-                className="inline-flex h-11 items-center justify-center gap-2 self-start rounded-pill bg-accent px-6 text-body font-bold text-accent-foreground transition-opacity hover:opacity-90 sm:self-center"
-              >
-                {t('getFinancing')}
-                <Arrow aria-hidden className="h-4 w-4" />
-              </Link>
-            </Card>
-
-            {/* Stat tiles */}
-            <div className="grid gap-4 sm:grid-cols-3">
-              <StatTile
-                label={t('activeOutstanding')}
-                value={activeContract ? formatCurrency(activeContract.outstanding, locale) : '—'}
-                hint={activeContract ? t('activeContract') : t('noContract')}
-              />
-              <StatTile
-                label={t('latestScore')}
-                value={assessment ? assessment.score : '—'}
-                hint={assessment ? t('band', { band: assessment.risk_band }) : t('notScored')}
-              />
-              <StatTile
-                label={t('pendingSettlements')}
-                value={pending.length}
-                hint={t('acrossPlatforms')}
-              />
-            </div>
+            {/* Hero: held receivables - the signature financing card */}
+            <FinCard
+              badge={t('heldBadge')}
+              amount={formatCurrency(held, locale)}
+              rows={[
+                {
+                  label: t('activeOutstanding'),
+                  value: activeContract ? formatCurrency(activeContract.outstanding, locale) : '-',
+                },
+                {
+                  label: t('latestScore'),
+                  value: assessment ? `${assessment.score} · ${assessment.risk_band}` : '-',
+                },
+                { label: t('pendingSettlements'), value: pending.length },
+              ]}
+              footer={
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <span className="max-w-xs text-[13px] text-brand-cream/60">{t('heldHint')}</span>
+                  <Link
+                    href="/financing"
+                    locale={locale}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-pill bg-accent px-6 font-display text-body font-bold text-accent-foreground shadow-[0_12px_24px_-14px_rgba(195,107,78,0.9)] transition-transform hover:-translate-y-0.5"
+                  >
+                    {t('getFinancing')}
+                    <Arrow aria-hidden className="h-4 w-4" />
+                  </Link>
+                </div>
+              }
+            />
 
             {/* Revenue chart */}
             <Card className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <TrendingUp aria-hidden className="h-4 w-4 text-accent" />
-                <h2 className="text-body font-bold text-body-text">{t('revenueTitle')}</h2>
-              </div>
+              <CardHeading icon={<IconGrowth className="h-5 w-5" />}>{t('revenueTitle')}</CardHeading>
               <AreaChart points={revenueSeries} />
               <span className="text-meta text-muted-text">{t('revenueHint')}</span>
             </Card>
@@ -198,7 +189,7 @@ export default function DashboardPage() {
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Settlements */}
               <Card className="flex flex-col gap-4">
-                <h2 className="text-body font-bold text-body-text">{t('upcomingSettlements')}</h2>
+                <CardHeading icon={<IconCashflow className="h-5 w-5" />}>{t('upcomingSettlements')}</CardHeading>
                 <div className="flex flex-col gap-2">
                   {pending.slice(0, 6).map((s) => (
                     <div
@@ -229,7 +220,7 @@ export default function DashboardPage() {
 
               {/* Alerts */}
               <Card className="flex flex-col gap-4">
-                <h2 className="text-body font-bold text-body-text">{t('alertsTitle')}</h2>
+                <CardHeading icon={<IconRiskShield className="h-5 w-5" />}>{t('alertsTitle')}</CardHeading>
                 <div className="flex flex-col gap-2">
                   {alerts.length === 0 ? (
                     <span className="text-meta text-muted-text">{t('noAlerts')}</span>

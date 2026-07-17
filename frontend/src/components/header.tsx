@@ -1,17 +1,29 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { LangToggle } from '@/components/lang-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { RafidMark } from '@/components/rafid-mark';
 
 export function Header() {
   const t = useTranslations('brand');
   const tNav = useTranslations('nav');
+  const pathname = usePathname();
+
+  // The landing page carries its own full-bleed hero nav, so the global
+  // chrome steps aside there.
+  if (pathname === '/') return null;
 
   return (
-    <header className="border-b border-hairline bg-card">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/" className="text-h1 font-bold text-brand-navy dark:text-brand-cream">
-          {t('name')}
+    <header className="sticky top-0 z-40 border-b border-hairline bg-page-bg/85 backdrop-blur-md">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 text-brand-navy dark:text-brand-cream"
+        >
+          <RafidMark className="h-9 w-12" />
+          <span className="font-display text-[18px] font-bold">{t('name')}</span>
         </Link>
         <div className="flex items-center gap-2">
           <Link

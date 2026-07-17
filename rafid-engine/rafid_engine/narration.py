@@ -22,10 +22,13 @@ The engine does not import any LLM SDK or hold an API key. The caller injects a
 from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Callable, Optional
 
 from .schema import Decision, Explanation, Localized, Outcome
+
+logger = logging.getLogger("rafid_engine.narration")
 
 Complete = Callable[[str], str]
 
@@ -86,11 +89,19 @@ def _passes_guard(summary: Localized, decision: Decision, context: dict) -> bool
     allowed = _numbers(json.dumps(context, ensure_ascii=False))
     emitted = _numbers(summary.ar) | _numbers(summary.en)
     if not emitted <= allowed:
+        logger.warning(
+            "narration guard rejected output: unrecognized figures %s (assessment_id=%s)",
+            sorted(emitted - allowed), decision.assessment_id,
+        )
         return False  # a figure the engine never provided -> reject
     # for approvals, the amount must actually appear (the model didn't drop it)
     if decision.funding_recommendation.decision == Outcome.approve:
         amount = str(int(decision.funding_recommendation.recommended_amount))
         if amount not in summary.en.replace(",", "") or amount not in summary.ar.replace(",", ""):
+            logger.warning(
+                "narration guard rejected output: recommended amount %s missing from summary "
+                "(assessment_id=%s)", amount, decision.assessment_id,
+            )
             return False
     return True
 
@@ -111,9 +122,20 @@ def enrich_explanation(
         prompt = _GROUNDING_PROMPT.format(
             audience=audience, facts=json.dumps(context, ensure_ascii=False, indent=2)
         )
-        summary = _parse(complete(prompt))
-        if summary is None or not _passes_guard(summary, decision, context):
+        raw = complete(prompt)
+        summary = _parse(raw)
+        if summary is None:
+            logger.warning(
+                "narration fallback: completion was not valid {ar, en} JSON "
+                "(assessment_id=%s)", decision.assessment_id,
+            )
             return decision
+        if not _passes_guard(summary, decision, context):
+            return decision  # _passes_guard already logged the specific reason
         return decision.model_copy(update={"explanation": Explanation(summary=summary)})
     except Exception:
+        logger.exception(
+            "narration fallback: completion call raised (assessment_id=%s)",
+            decision.assessment_id,
+        )
         return decision  # narration is best-effort; the decision is already complete

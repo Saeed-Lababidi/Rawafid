@@ -6,12 +6,12 @@ import { useTranslations } from 'next-intl';
 
 type Status = 'checking' | 'live' | 'down';
 
-// Polling cadence is Claude's discretion per CONTEXT.md — 30s keeps the badge
+// Polling cadence is Claude's discretion per CONTEXT.md - 30s keeps the badge
 // fresh without hammering the free-tier backend host.
 const POLL_INTERVAL_MS = 30_000;
 
 // Module-level external store: polling lives outside React state so the
-// subscription (not an effect body) is what starts/stops the interval —
+// subscription (not an effect body) is what starts/stops the interval -
 // idiomatic "subscribe to an external system" usage of useSyncExternalStore,
 // avoiding a setState-in-effect footgun for something that runs forever.
 function createHealthStore() {
