@@ -21,6 +21,7 @@ import type {
   Role,
   SalesOrderOut,
   SettlementOut,
+  TransactionOut,
   TokenPair,
   UserOut,
 } from './types';
@@ -224,6 +225,8 @@ export const completeConsent = (session_id: string, auth_code = 'demo') =>
 export const aggregate = () =>
   api<AggregateResponse>('/merchants/me/aggregate', { method: 'POST' });
 export const getAccounts = () => api<BankAccountOut[]>('/accounts');
+export const getTransactions = (limit = 500) =>
+  api<TransactionOut[]>(`/transactions?limit=${limit}`);
 export const getSales = (limit = 5000) => api<SalesOrderOut[]>(`/sales?limit=${limit}`);
 export const getSettlements = () => api<SettlementOut[]>('/settlements');
 export const receiveSettlement = (id: string) =>
@@ -253,6 +256,13 @@ export const getPortfolio = () => api<PortfolioOut>('/admin/portfolio');
 export const getAdminMerchants = () => api<import('./types').MerchantOut[]>('/admin/merchants');
 export const getAdminMerchant = (id: string) =>
   api<AdminMerchantDetailOut>(`/admin/merchants/${id}`);
+export const annotateOffer = (offerId: string, annotation: string) =>
+  api<OfferOut>(`/admin/offers/${offerId}/annotate`, {
+    method: 'POST',
+    body: { annotation },
+  });
+export const getAdminAssessment = (id: string) =>
+  api<AssessmentDetailOut>(`/admin/assessments/${id}`);
 export const getAdminAlerts = () =>
   api<RiskAlertOut[]>('/admin/alerts?include_resolved=false');
 export interface TickResponse {

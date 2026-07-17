@@ -6,7 +6,7 @@ import { CheckCircle2, ClipboardCheck, Sparkles } from 'lucide-react';
 import { AppShell } from '@/components/app/app-shell';
 import { Button, Card, CardHeading, Chip, RiskChip } from '@/components/ui/primitives';
 import { FinCard } from '@/components/brand';
-import { IconGrowth, IconInvoice, IconSharia } from '@/components/brand-icons';
+import { IconGrowth, IconInvoice, IconRepeat, IconSharia } from '@/components/brand-icons';
 import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { ContributionBars, ScoreGauge } from '@/components/ui/charts';
 import { bandColor } from '@/components/ui/charts';
@@ -28,29 +28,24 @@ import {
   getContract,
   getContracts,
   getOffers,
+  getRepayments,
   rejectOffer,
   runAssessment,
 } from '@/lib/api';
 import { POLL, qk } from '@/lib/query';
+import { MERCHANT_NAV } from '@/lib/nav';
 import { outcomeOf } from '@/lib/decision';
 import { engineOf, SCORE_MAX, scoreFraction } from '@/lib/engine';
 import { formatCurrency, formatDate, type Locale } from '@/lib/format';
 import type { AssessmentDetailOut, ContractDetailOut, OfferOut } from '@/lib/types';
-
-const NAV = [
-  { href: '/dashboard', key: 'dashboard' },
-  { href: '/financing', key: 'financing' },
-  { href: '/settings', key: 'settings' },
-];
 
 const SCHEDULE_TONE = { paid: 'good', partial: 'warn', pending: 'neutral' } as const;
 
 export default function FinancingPage() {
   const t = useTranslations('financing');
   const tNav = useTranslations('app');
-  const tDash = useTranslations('dashboard');
   const locale = useLocale() as Locale;
-  const nav = NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
+  const nav = MERCHANT_NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
 
   const queryClient = useQueryClient();
   const { toast, toastError } = useToast();
@@ -76,10 +71,12 @@ export default function FinancingPage() {
     refetchInterval: activeContractRow?.status === 'active' ? POLL.live : false,
   });
 
-  // The full assessment detail is only rendered when there's no contract and no
-  // open offer — don't fetch it otherwise.
+  // Which step to show is only knowable once contracts AND offers have both
+  // answered: a merchant with an open offer must never flash the assessment
+  // screen (or fetch its detail) just because `offers` hadn't landed yet.
+  const stepResolved = contractsQ.isSuccess && offersQ.isSuccess && assessmentsQ.isSuccess;
   const needsAssessmentDetail =
-    Boolean(latestAssessmentId) && !activeContractRow && !openOffer;
+    stepResolved && Boolean(latestAssessmentId) && !activeContractRow && !openOffer;
   const assessmentQ = useQuery({
     queryKey: qk.assessment(latestAssessmentId ?? ''),
     queryFn: () => getAssessment(latestAssessmentId!),
@@ -252,9 +249,65 @@ export default function FinancingPage() {
             ))}
           </div>
         </Card>
+
+        <RepaymentsLedger contractId={contract.id} />
       </div>
     );
   }
+}
+
+/**
+ * The collection events themselves. The schedule above is the plan; this is
+ * what was actually taken, and from which settlement — the proof behind
+ * "repays itself". Polls alongside the contract because the monitoring agent
+ * applies repayments on its own.
+ */
+function RepaymentsLedger({ contractId }: { contractId: string }) {
+  const t = useTranslations('financing');
+  const locale = useLocale() as Locale;
+
+  const repaymentsQ = useQuery({
+    queryKey: qk.repayments(contractId),
+    queryFn: () => getRepayments(contractId),
+    refetchInterval: POLL.live,
+  });
+
+  const repayments = repaymentsQ.data ?? [];
+
+  return (
+    <Card className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <CardHeading icon={<IconRepeat className="h-5 w-5" />}>{t('ledgerTitle')}</CardHeading>
+        <p className="text-meta text-muted-text">{t('ledgerHint')}</p>
+      </div>
+
+      <QueryBoundary
+        isLoading={repaymentsQ.isLoading}
+        isError={repaymentsQ.isError}
+        onRetry={() => repaymentsQ.refetch()}
+        skeleton={<Skeleton className="h-20 w-full" />}
+        isEmpty={repayments.length === 0}
+        emptyTitle={t('ledgerEmpty')}
+        emptyBody={t('ledgerEmptyBody')}
+      >
+        <div className="flex flex-col divide-y divide-hairline">
+          {repayments.map((r) => (
+            <div key={r.id} className="flex items-center justify-between gap-3 py-2.5">
+              <div className="flex flex-col">
+                <span className="text-body text-body-text">{t('collected')}</span>
+                <span className="font-mono text-meta text-muted-text">
+                  {formatDate(r.applied_at, locale)}
+                </span>
+              </div>
+              <span className="text-body font-bold text-risk-a">
+                <bdi>-{formatCurrency(r.amount, locale)}</bdi>
+              </span>
+            </div>
+          ))}
+        </div>
+      </QueryBoundary>
+    </Card>
+  );
 }
 
 function OfferView({

@@ -11,16 +11,11 @@ import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { useToast } from '@/components/providers/toast-provider';
 import { getConnections, getMerchant, revokeConnection, updateMerchant } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { MERCHANT_NAV } from '@/lib/nav';
 import type { ConnectionOut } from '@/lib/types';
 
 const BUSINESS_TYPES = ['ecommerce', 'food', 'other'] as const;
 const CITIES = ['Riyadh', 'Jeddah', 'Dammam', 'Mecca', 'Medina'] as const;
-
-const NAV = [
-  { href: '/dashboard', key: 'dashboard' },
-  { href: '/financing', key: 'financing' },
-  { href: '/settings', key: 'settings' },
-];
 
 export default function SettingsPage() {
   const t = useTranslations('settings');
@@ -29,7 +24,7 @@ export default function SettingsPage() {
   const queryClient = useQueryClient();
   const { toast, toastError } = useToast();
 
-  const nav = NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
+  const nav = MERCHANT_NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
 
   const merchantQ = useQuery({ queryKey: qk.merchant, queryFn: getMerchant });
   const connectionsQ = useQuery({ queryKey: qk.connections, queryFn: getConnections });

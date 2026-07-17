@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
-import { FastForward } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FastForward } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import { AppShell } from '@/components/app/app-shell';
 import { Button, Card, CardHeading, Chip, StatTile } from '@/components/ui/primitives';
 import { IconGrowth, IconRiskShield, IconSME } from '@/components/brand-icons';
@@ -17,9 +18,9 @@ import {
   monitorTick,
 } from '@/lib/api';
 import { POLL, qk } from '@/lib/query';
+import { ADMIN_NAV } from '@/lib/nav';
 import { formatCurrency, type Locale } from '@/lib/format';
 
-const NAV = [{ href: '/admin', key: 'portfolio' }];
 const BANDS = ['A', 'B', 'C', 'D'] as const;
 
 export default function AdminPage() {
@@ -27,7 +28,8 @@ export default function AdminPage() {
   const tNav = useTranslations('app');
   const tDash = useTranslations('dashboard');
   const locale = useLocale() as Locale;
-  const nav = NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
+  const nav = ADMIN_NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
+  const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight;
 
   const queryClient = useQueryClient();
   const { toastError } = useToast();
@@ -207,20 +209,38 @@ export default function AdminPage() {
               </div>
             </Card>
 
-            {/* Merchant list */}
+            {/* Merchant list — each row opens the underwriter's full file */}
             <Card className="flex flex-col gap-4">
-              <CardHeading icon={<IconSME className="h-5 w-5" />}>{t('merchantsTitle')}</CardHeading>
+              <div className="flex flex-col gap-1">
+                <CardHeading icon={<IconSME className="h-5 w-5" />}>
+                  {t('merchantsTitle')}
+                </CardHeading>
+                <p className="text-meta text-muted-text">{t('merchantsHint')}</p>
+              </div>
               <div className="flex flex-col divide-y divide-hairline">
                 {merchants.map((m) => (
-                  <div key={m.id} className="flex items-center justify-between py-2.5">
+                  <Link
+                    key={m.id}
+                    href={`/admin/merchants/${m.id}`}
+                    locale={locale}
+                    className="group flex items-center justify-between gap-3 py-2.5 transition-colors hover:text-accent"
+                  >
                     <div className="flex flex-col">
-                      <span className="text-body font-bold text-body-text"><bdi>{m.name}</bdi></span>
+                      <span className="text-body font-bold text-body-text group-hover:text-accent">
+                        <bdi>{m.name}</bdi>
+                      </span>
                       <span className="text-meta text-muted-text capitalize">
                         <bdi>{m.business_type}</bdi> · <bdi>{m.city}</bdi>
                       </span>
                     </div>
-                    <Chip tone="good">{t('verified')}</Chip>
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <Chip tone="good">{t('verified')}</Chip>
+                      <Arrow
+                        aria-hidden
+                        className="h-4 w-4 text-muted-text group-hover:text-accent"
+                      />
+                    </div>
+                  </Link>
                 ))}
               </div>
             </Card>

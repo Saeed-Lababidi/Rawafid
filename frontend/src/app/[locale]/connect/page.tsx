@@ -12,7 +12,7 @@
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Building2, Check, Landmark, ShieldCheck, Store } from 'lucide-react';
+import { Building2, Check, Landmark, ShieldCheck, Store, TriangleAlert } from 'lucide-react';
 import { useRouter } from '@/i18n/navigation';
 import { AppShell } from '@/components/app/app-shell';
 import { Button, Card, Chip } from '@/components/ui/primitives';
@@ -25,17 +25,13 @@ import {
   startConsent,
 } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { MERCHANT_NAV } from '@/lib/nav';
 import { formatCurrency, formatNumber, type Locale } from '@/lib/format';
 import type { AggregateResponse, ConsentStartResponse } from '@/lib/types';
 
 // From app/providers/base.py — the backend rejects anything else with a 400.
 const BANKS = ['alinma', 'alrajhi_synth', 'riyad_synth'] as const;
 const PLATFORMS = ['salla', 'zid', 'jahez', 'foodics'] as const;
-
-const NAV = [
-  { href: '/dashboard', key: 'dashboard' },
-  { href: '/financing', key: 'financing' },
-];
 
 type Stage = 'bank' | 'sales' | 'aggregate' | 'done';
 
@@ -47,7 +43,7 @@ export default function ConnectPage() {
   const queryClient = useQueryClient();
   const { toastError } = useToast();
 
-  const nav = NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
+  const nav = MERCHANT_NAV.map((n) => ({ href: n.href, label: tNav(n.key) }));
 
   const connectionsQ = useQuery({ queryKey: qk.connections, queryFn: getConnections });
   const connections = connectionsQ.data ?? [];
@@ -99,6 +95,21 @@ export default function ConnectPage() {
   });
 
   const busy = startM.isPending || completeM.isPending;
+
+  // A connected platform can legitimately return no orders: the mock provider
+  // only generates data for the platforms in a merchant's own synthetic
+  // profile, so a self-registered merchant who picks a platform it didn't
+  // assign gets an empty pull. Aggregation still reports success, and the
+  // failure would otherwise only surface two screens later as "no aggregated
+  // sales data" on the assessment. Say so here, where it can be acted on.
+  const aggregatedNothing =
+    aggregateResult !== null &&
+    aggregateResult.sales_orders === 0 &&
+    aggregateResult.held_receivables_total === 0;
+
+  const unconnectedPlatforms = PLATFORMS.filter(
+    (p) => !activeSales.some((c) => c.institution === p),
+  );
 
   return (
     <AppShell role="merchant" nav={nav}>
@@ -161,6 +172,33 @@ export default function ConnectPage() {
                 <Button loading={aggregateM.isPending} onClick={() => aggregateM.mutate()}>
                   {t('aggregateCta')}
                 </Button>
+              </Card>
+            ) : aggregatedNothing ? (
+              <Card className="flex flex-col items-center gap-5 py-10 text-center">
+                <TriangleAlert aria-hidden className="h-10 w-10 text-chip-warn-text" />
+                <div className="flex max-w-md flex-col gap-2">
+                  <h2 className="text-body font-bold text-body-text">{t('emptyPullTitle')}</h2>
+                  <p className="text-body text-body-text-muted">{t('emptyPullBody')}</p>
+                </div>
+                {unconnectedPlatforms.length > 0 ? (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {unconnectedPlatforms.map((p) => (
+                      <Button
+                        key={p}
+                        variant="secondary"
+                        disabled={busy}
+                        onClick={() => {
+                          setAggregateResult(null);
+                          startM.mutate({ kind: 'sales', institution: p });
+                        }}
+                      >
+                        {t(`platforms.${p}`)}
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-meta text-muted-text">{t('emptyPullExhausted')}</span>
+                )}
               </Card>
             ) : aggregateResult ? (
               <AggregateResult

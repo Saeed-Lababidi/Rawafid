@@ -47,9 +47,21 @@
     "title": "Vision 2030 wants banks financing far more small businesses. Assessing them is the blocker.",
     "body": "Saudi small and medium businesses drive the economy, yet only a fraction can access bank financing. The barrier is not appetite, it is visibility: a merchant's real sales are scattered across delivery and e-commerce aggregators, and their earnings sit locked for weeks. Banks like Alinma cannot easily see who is creditworthy, so they underwrite far fewer SMEs than the Vision 2030 target.",
     "stats": {
-      "target": { "value": "20", "suffix": "%", "label": "Vision 2030 target for the SME share of bank financing" },
-      "actual": { "value": "9", "suffix": "%", "label": "Roughly where big banks sit today, about halfway there" },
-      "locked": { "value": "14", "suffix": " days", "label": "How long a merchant's earnings stay locked behind the aggregators" }
+      "target": {
+        "value": "20",
+        "suffix": "%",
+        "label": "Vision 2030 target for the SME share of bank financing"
+      },
+      "actual": {
+        "value": "9",
+        "suffix": "%",
+        "label": "Roughly where big banks sit today, about halfway there"
+      },
+      "locked": {
+        "value": "14",
+        "suffix": " days",
+        "label": "How long a merchant's earnings stay locked behind the aggregators"
+      }
     },
     "note": "Figures are illustrative for the demo, pending licensed market data."
   },
@@ -103,31 +115,51 @@
     }
   },
   "engine": {
-    "eyebrow": "The Rafid engine",
-    "title": "Transparent, explainable credit scoring",
-    "body": "The engine reads months of real sales across every aggregator and your open banking data to score creditworthiness in the open, with every factor shown. A living score that improves with each transaction.",
-    "features": {
-      "sales": { "title": "Live sales data", "body": "Volume and trend across all platforms, in real time." },
-      "repayment": { "title": "Repayment behaviour", "body": "Consistency of repayment tracked with every sale." },
-      "risk": { "title": "Early risk detection", "body": "Signals surface before a repayment ever stumbles." }
+    "confidenceTitle": "Decision confidence",
+    "confidenceHint": "How much data stands behind this assessment — separate from the score itself.",
+    "confidenceBand": {
+      "high": "High confidence",
+      "medium": "Medium confidence",
+      "low": "Low confidence"
     },
-    "viz": {
-      "score": "A-",
-      "scoreLabel": "Creditworthiness score · ready to recommend",
-      "repayment": "Repayment consistency",
-      "growth": "Sales growth",
-      "stability": "Activity stability"
-    }
+    "factorsTitle": "The seven factors",
+    "factorsHint": "Each factor's share of your score, and whether it helped or held you back.",
+    "factorWeight": "Weight {pct}%",
+    "strengthsTitle": "Strengths",
+    "weaknessesTitle": "What's holding you back",
+    "none": "None identified.",
+    "nextStepsTitle": "How to improve your score",
+    "repaymentTitle": "How repayment would work",
+    "repaymentHint": "Indicative projection — collected automatically from your upcoming settlements. Your final terms appear on the offer.",
+    "projected": "Forecast",
+    "ofSettlement": "of {amount} expected",
+    "payoffBy": "Fully repaid by {date}",
+    "poweredBy": "Rafid Engine v{version}",
+    "thresholds": "Ruleset {version}",
+    "rulesFired": "{count} rules fired",
+    "modelVersion": "Model {version}"
   },
   "product": {
     "eyebrow": "The product",
     "title": "One platform, four views",
     "body": "The same unified data, shown for whoever is looking, from the merchant floor to the underwriter's desk.",
     "screens": {
-      "dashboard": { "title": "Merchant dashboard", "body": "Unified sales, held receivables and cashflow in one place." },
-      "financing": { "title": "Financing", "body": "The optional cash advance offer and its repayment schedule." },
-      "engine": { "title": "Explainable score", "body": "The credit score with every contributing factor shown." },
-      "bank": { "title": "Bank view", "body": "Qualified SMEs and their scores, ready for Alinma." }
+      "dashboard": {
+        "title": "Merchant dashboard",
+        "body": "Unified sales, held receivables and cashflow in one place."
+      },
+      "financing": {
+        "title": "Financing",
+        "body": "The optional cash advance offer and its repayment schedule."
+      },
+      "engine": {
+        "title": "Explainable score",
+        "body": "The credit score with every contributing factor shown."
+      },
+      "bank": {
+        "title": "Bank view",
+        "body": "Qualified SMEs and their scores, ready for Alinma."
+      }
     },
     "showcase": {
       "badge": "Working capital line",
@@ -139,9 +171,12 @@
       "drawnValue": "SAR 90,000",
       "reviewLabel": "Next review",
       "reviewValue": "Mar 2027",
-      "stat1Label": "Repayment", "stat1Value": "92%",
-      "stat2Label": "Growth", "stat2Value": "78%",
-      "stat3Label": "Stability", "stat3Value": "85%"
+      "stat1Label": "Repayment",
+      "stat1Value": "92%",
+      "stat2Label": "Growth",
+      "stat2Value": "78%",
+      "stat3Label": "Stability",
+      "stat3Value": "85%"
     }
   },
   "forAlinma": {
@@ -162,9 +197,30 @@
     "body": "Rafid subscriptions scale with operational volume, the number of sales we process, not with any financing amount. Charging on financing volume would be bay al-dayn, so we never do it. More sales means more work on our side, and that is the only thing our tiers are built on.",
     "note": "Sharia-compliant by design: subscription tiers track sales volume, not financing value.",
     "tiers": {
-      "starter": { "name": "Starter", "meta": "For a single shop", "priceLabel": "up to 1,000 orders / month", "f1": "Unified sales dashboard", "f2": "Cashflow and settlement tracking", "f3": "Email support" },
-      "growth": { "name": "Growth", "meta": "Most popular", "priceLabel": "up to 10,000 orders / month", "f1": "Everything in Starter", "f2": "Daily cashflow advance", "f3": "Explainable credit score" },
-      "scale": { "name": "Scale", "meta": "For multi-branch SMEs", "priceLabel": "unlimited orders", "f1": "Everything in Growth", "f2": "Priority underwriting to Alinma", "f3": "Dedicated support" }
+      "starter": {
+        "name": "Starter",
+        "meta": "For a single shop",
+        "priceLabel": "up to 1,000 orders / month",
+        "f1": "Unified sales dashboard",
+        "f2": "Cashflow and settlement tracking",
+        "f3": "Email support"
+      },
+      "growth": {
+        "name": "Growth",
+        "meta": "Most popular",
+        "priceLabel": "up to 10,000 orders / month",
+        "f1": "Everything in Starter",
+        "f2": "Daily cashflow advance",
+        "f3": "Explainable credit score"
+      },
+      "scale": {
+        "name": "Scale",
+        "meta": "For multi-branch SMEs",
+        "priceLabel": "unlimited orders",
+        "f1": "Everything in Growth",
+        "f2": "Priority underwriting to Alinma",
+        "f3": "Dedicated support"
+      }
     }
   },
   "finalCta": {
@@ -189,7 +245,9 @@
     "dashboard": "Dashboard",
     "financing": "Financing",
     "settings": "Settings",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "sales": "Sales",
+    "cashflow": "Cashflow"
   },
   "register": {
     "title": "Create your Rafid account",
@@ -205,7 +263,11 @@
     "genericError": "Something went wrong. Try again.",
     "haveAccount": "Already have an account?",
     "signIn": "Sign in",
-    "types": { "ecommerce": "E-commerce", "food": "Food & beverage", "other": "Other" },
+    "types": {
+      "ecommerce": "E-commerce",
+      "food": "Food & beverage",
+      "other": "Other"
+    },
     "cities": {
       "Riyadh": "Riyadh",
       "Jeddah": "Jeddah",
@@ -256,8 +318,20 @@
       "alrajhi_synth": "Al Rajhi Bank",
       "riyad_synth": "Riyad Bank"
     },
-    "platforms": { "salla": "Salla", "zid": "Zid", "jahez": "Jahez", "foodics": "Foodics" },
-    "status": { "active": "Connected", "pending_consent": "Pending", "revoked": "Revoked" }
+    "platforms": {
+      "salla": "Salla",
+      "zid": "Zid",
+      "jahez": "Jahez",
+      "foodics": "Foodics"
+    },
+    "status": {
+      "active": "Connected",
+      "pending_consent": "Pending",
+      "revoked": "Revoked"
+    },
+    "emptyPullTitle": "No sales came back from that platform",
+    "emptyPullBody": "That account has no orders in the last 90 days, so there is nothing to assess yet. Connect another platform to bring your sales in.",
+    "emptyPullExhausted": "All platforms are connected, but none returned orders. Check your platform account has recent sales."
   },
   "settings": {
     "title": "Settings",
@@ -269,7 +343,10 @@
     "saved": "Profile updated.",
     "error": "Something went wrong. Try again.",
     "verification": "Verification: {status}",
-    "verificationStatus": { "verified": "Verified", "pending": "Pending" },
+    "verificationStatus": {
+      "verified": "Verified",
+      "pending": "Pending"
+    },
     "connectionsTitle": "Connected accounts",
     "connectionsHint": "Revoking a source stops it contributing to future assessments.",
     "noConnections": "You haven't connected any accounts yet.",
@@ -280,7 +357,11 @@
     "revokeConfirm": "Yes, revoke",
     "revoked": "Access revoked.",
     "cancel": "Cancel",
-    "types": { "ecommerce": "E-commerce", "food": "Food & beverage", "other": "Other" },
+    "types": {
+      "ecommerce": "E-commerce",
+      "food": "Food & beverage",
+      "other": "Other"
+    },
     "cities": {
       "Riyadh": "Riyadh",
       "Jeddah": "Jeddah",
@@ -288,27 +369,6 @@
       "Mecca": "Mecca",
       "Medina": "Medina"
     }
-  },
-  "engine": {
-    "confidenceTitle": "Decision confidence",
-    "confidenceHint": "How much data stands behind this assessment — separate from the score itself.",
-    "confidenceBand": { "high": "High confidence", "medium": "Medium confidence", "low": "Low confidence" },
-    "factorsTitle": "The seven factors",
-    "factorsHint": "Each factor's share of your score, and whether it helped or held you back.",
-    "factorWeight": "Weight {pct}%",
-    "strengthsTitle": "Strengths",
-    "weaknessesTitle": "What's holding you back",
-    "none": "None identified.",
-    "nextStepsTitle": "How to improve your score",
-    "repaymentTitle": "How repayment would work",
-    "repaymentHint": "Indicative projection — collected automatically from your upcoming settlements. Your final terms appear on the offer.",
-    "projected": "Forecast",
-    "ofSettlement": "of {amount} expected",
-    "payoffBy": "Fully repaid by {date}",
-    "poweredBy": "Rafid Engine v{version}",
-    "thresholds": "Ruleset {version}",
-    "rulesFired": "{count} rules fired",
-    "modelVersion": "Model {version}"
   },
   "state": {
     "errorTitle": "Couldn't load this",
@@ -328,9 +388,18 @@
     "createAccount": "Create one",
     "demoLabel": "Or jump straight into a demo account",
     "demo": {
-      "merchantHealthy": { "name": "Healthy merchant", "desc": "TechSouq, strong receivables, happy path" },
-      "merchantRisky": { "name": "At-risk merchant", "desc": "Amber Cosmetics, revenue drop and delays" },
-      "admin": { "name": "Bank underwriter", "desc": "Portfolio and risk dashboard" }
+      "merchantHealthy": {
+        "name": "Healthy merchant",
+        "desc": "TechSouq, strong receivables, happy path"
+      },
+      "merchantRisky": {
+        "name": "At-risk merchant",
+        "desc": "Amber Cosmetics, revenue drop and delays"
+      },
+      "admin": {
+        "name": "Bank underwriter",
+        "desc": "Portfolio and risk dashboard"
+      }
     }
   },
   "dashboard": {
@@ -357,7 +426,19 @@
     "noSettlements": "No pending settlements.",
     "alertsTitle": "Alerts",
     "noAlerts": "No alerts, all clear.",
-    "severity": { "low": "Low", "medium": "Medium", "high": "High" }
+    "severity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "salesBadge": "Total sales",
+    "last90d": "last 90 days",
+    "salesHint": "Every order from every connected platform, in one place.",
+    "viewSales": "View all sales",
+    "ordersLabel": "Orders",
+    "platformsLabel": "Platforms",
+    "outstandingInline": "Outstanding {amount}",
+    "viewContract": "View contract"
   },
   "financing": {
     "title": "Financing",
@@ -397,7 +478,17 @@
     "profit": "Disclosed profit",
     "totalDue": "Total due",
     "scheduleTitle": "Repayment schedule",
-    "schedule": { "paid": "Paid", "partial": "Partial", "pending": "Pending" }
+    "schedule": {
+      "paid": "Paid",
+      "partial": "Partial",
+      "pending": "Pending"
+    },
+    "ledgerTitle": "Collection history",
+    "ledgerHint": "What was actually collected, and when. Taken automatically from your settlements.",
+    "ledgerEmpty": "Nothing collected yet",
+    "ledgerEmptyBody": "Repayments appear here as your platform settlements arrive.",
+    "collected": "Collected from settlement",
+    "approvedShort": "Approved"
   },
   "admin": {
     "title": "Portfolio",
@@ -423,6 +514,99 @@
     "openAlerts": "{count} open",
     "noAlerts": "No open alerts.",
     "merchantsTitle": "Merchants",
-    "verified": "Verified"
+    "verified": "Verified",
+    "merchantsHint": "Open any merchant to see the full underwriting file."
+  },
+  "sales": {
+    "title": "Sales",
+    "subtitle": "Every order from every delivery and e-commerce platform, merged into one live view.",
+    "revenue90d": "Revenue, last 90 days",
+    "orders90d": "Completed orders",
+    "platformsConnected": "Platforms",
+    "trendTitle": "Daily revenue",
+    "trendHint": "Completed orders across all connected platforms.",
+    "byPlatformTitle": "Revenue by platform",
+    "byPlatformHint": "Where your money actually comes from. Heavy reliance on one platform lowers your score.",
+    "noPlatforms": "No sales data yet. Connect a platform to see this.",
+    "ordersCount": "{count} orders",
+    "refunded": "{count} refunded",
+    "refundedOne": "Refunded",
+    "tabOrders": "Orders",
+    "tabTransactions": "Bank activity",
+    "tabAccounts": "Accounts",
+    "recentOrders": "Latest {count} orders",
+    "noOrders": "No orders yet.",
+    "transactionsTitle": "Bank activity",
+    "transactionsHint": "Money moving through your connected bank account. Payouts from aggregators are tagged.",
+    "noTransactions": "No transactions yet.",
+    "payout": "Platform payout",
+    "accountsTitle": "Connected accounts",
+    "noAccounts": "No bank accounts connected."
+  },
+  "cashflow": {
+    "title": "Cashflow",
+    "subtitle": "What each platform is holding, and when it lands in your account.",
+    "heldNow": "Held by platforms",
+    "pendingCount": "Awaiting release",
+    "receivedCount": "Released",
+    "pendingTitle": "Awaiting release",
+    "pendingHint": "Aggregators hold your earnings for days or weeks. This is what is still with them.",
+    "noPending": "Nothing pending. Every payout has landed.",
+    "expected": "Expected",
+    "receivedOn": "Received",
+    "delayed": "Delayed",
+    "receiveNow": "Simulate release",
+    "receivedToast": "{amount} released. Any repayment due was collected automatically.",
+    "receivedTitle": "Released payouts",
+    "receivedChip": "Received",
+    "alertsTitle": "Risk alerts",
+    "error": "Something went wrong. Try again.",
+    "alertType": {
+      "revenue_drop": "Revenue drop",
+      "settlement_delay": "Settlement delay",
+      "missed_repayment": "Missed repayment"
+    }
+  },
+  "adminMerchant": {
+    "backToPortfolio": "Back to portfolio",
+    "since": "trading since {date}",
+    "connections": "Sources",
+    "assessments": "Assessments",
+    "contracts": "Contracts",
+    "openAlerts": "Open alerts",
+    "connectionsTitle": "Connected sources",
+    "noConnections": "No sources connected.",
+    "assessmentsTitle": "Assessment history",
+    "noAssessments": "This merchant has not been scored yet.",
+    "approved": "Approved",
+    "notApproved": "Not approved",
+    "underwritingTitle": "Underwriting review",
+    "maxAdvance": "Engine ceiling {amount}",
+    "offersTitle": "Offers",
+    "noOffers": "No offers issued.",
+    "advanceRate": "{pct}% advance rate",
+    "addNote": "Add underwriter note",
+    "editNote": "Edit note",
+    "saveNote": "Save note",
+    "notePlaceholder": "Visible to the merchant on their offer.",
+    "annotated": "Note saved. The merchant can see it.",
+    "cancel": "Cancel",
+    "error": "Something went wrong. Try again.",
+    "contractsTitle": "Contracts",
+    "disbursedOn": "disbursed {date}",
+    "outstandingInline": "outstanding {amount}",
+    "alertsTitle": "Alerts",
+    "resolved": "Resolved",
+    "offerStatus": {
+      "offered": "Live",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "contractStatus": {
+      "active": "Active",
+      "repaid": "Repaid",
+      "defaulted": "Defaulted"
+    }
   }
 }
