@@ -10,12 +10,6 @@ import { RafidMark } from '@/components/rafid-mark';
 import { FlowLines } from '@/components/flow-lines';
 import { Eyebrow, FinCard } from '@/components/brand';
 import { SolutionDiagram } from '@/components/solution-diagram';
-import {
-  BankPreview,
-  DashboardPreview,
-  EnginePreview,
-  FinancingPreview,
-} from '@/components/product-previews';
 import { useLandingMotion } from '@/lib/use-landing-motion';
 import {
   IconApproved,
@@ -62,11 +56,14 @@ export default function LandingPage() {
     { icon: IconRiskShield, k: 'risk' },
   ] as const;
 
+  // Real product screenshots (public/brand/shots), paired by shape so each grid
+  // row holds two same-aspect cards that start and end at the same points:
+  // row 1 = the landscape views, row 2 = the portrait views.
   const screens = [
-    { icon: IconWallet, k: 'dashboard', preview: <DashboardPreview /> },
-    { icon: IconInvoice, k: 'financing', preview: <FinancingPreview /> },
-    { icon: IconLiveData, k: 'engine', preview: <EnginePreview /> },
-    { icon: IconApproved, k: 'bank', preview: <BankPreview /> },
+    { icon: IconWallet, k: 'dashboard', aspect: 'aspect-[11/8]' },
+    { icon: IconInvoice, k: 'financing', aspect: 'aspect-[11/8]' },
+    { icon: IconLiveData, k: 'engine', aspect: 'aspect-[10/13]' },
+    { icon: IconApproved, k: 'bank', aspect: 'aspect-[10/13]' },
   ] as const;
 
   const tiers = ['starter', 'growth', 'professional', 'enterprise'] as const;
@@ -428,9 +425,16 @@ export default function LandingPage() {
             {tProduct('body')}
           </p>
 
-          <div data-reveal-group className="mt-12 grid gap-5 sm:grid-cols-2">
+          {/* Two-column grid paired by shape: both cards in a row share an
+              aspect box, so they start and end at the same points and read as
+              equal. object-contain keeps every screenshot fully visible. */}
+          <div data-reveal-group className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2">
             {screens.map((s) => (
-              <figure key={s.k} data-reveal className="overflow-hidden rounded-card border border-hairline bg-card shadow-[0_20px_44px_-30px_rgba(3,35,65,0.4)]">
+              <figure
+                key={s.k}
+                data-reveal
+                className="flex flex-col overflow-hidden rounded-card border-2 border-brand-navy/45 bg-card shadow-[0_20px_44px_-28px_rgba(3,35,65,0.55)] dark:border-brand-purple/55"
+              >
                 <div className="flex items-center gap-2 border-b border-hairline px-4 py-2.5">
                   <span className="h-2.5 w-2.5 rounded-full bg-hairline-strong" />
                   <span className="h-2.5 w-2.5 rounded-full bg-hairline-strong" />
@@ -440,12 +444,19 @@ export default function LandingPage() {
                     {tProduct(`screens.${s.k}.title`)}
                   </span>
                 </div>
-                <div className="aspect-[16/10] w-full bg-page-bg">{s.preview}</div>
-                <figcaption className="px-5 py-4">
-                  <div className="font-display text-[15.5px] font-bold text-brand-navy dark:text-brand-cream">
-                    {tProduct(`screens.${s.k}.title`)}
+                <div className={`w-full ${s.aspect} bg-page-bg`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/brand/shots/${s.k}.png`}
+                    alt={tProduct(`screens.${s.k}.title`)}
+                    loading="lazy"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                <figcaption className="mt-auto border-t border-hairline px-5 py-4">
+                  <div className="text-[13.5px] leading-relaxed text-body-text-muted">
+                    {tProduct(`screens.${s.k}.body`)}
                   </div>
-                  <div className="mt-1 text-[13.5px] text-body-text-muted">{tProduct(`screens.${s.k}.body`)}</div>
                 </figcaption>
               </figure>
             ))}
