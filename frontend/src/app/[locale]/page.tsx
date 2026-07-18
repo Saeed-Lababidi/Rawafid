@@ -69,7 +69,7 @@ export default function LandingPage() {
     { icon: IconApproved, k: 'bank', preview: <BankPreview /> },
   ] as const;
 
-  const tiers = ['starter', 'growth', 'scale'] as const;
+  const tiers = ['starter', 'growth', 'professional', 'enterprise'] as const;
 
   return (
     <div className="flex flex-col">
@@ -248,25 +248,31 @@ export default function LandingPage() {
             {tProblem('body')}
           </p>
           <div data-reveal-group className="mt-12 grid gap-4 sm:grid-cols-3">
-            {(['target', 'actual', 'locked'] as const).map((key) => (
-              <div
-                key={key}
-                data-reveal
-                className="rounded-card border border-white/10 bg-white/4 p-7 backdrop-blur-sm"
-              >
+            {(['target', 'actual', 'locked'] as const).map((key) => {
+              const value = tProblem(`stats.${key}.value`);
+              const suffix = tProblem(`stats.${key}.suffix`);
+              const decimals = value.includes('.') ? value.split('.')[1].length : 0;
+              return (
                 <div
-                  className="font-mono text-[40px] font-medium leading-none text-brand-terra sm:text-[46px]"
-                  data-count={tProblem(`stats.${key}.value`)}
-                  data-suffix={tProblem(`stats.${key}.suffix`)}
+                  key={key}
+                  data-reveal
+                  className="rounded-card border border-white/10 bg-white/4 p-7 backdrop-blur-sm"
                 >
-                  {tProblem(`stats.${key}.value`)}
-                  {tProblem(`stats.${key}.suffix`)}
+                  <div
+                    className="font-mono text-[40px] font-medium leading-none text-brand-terra sm:text-[46px]"
+                    data-count={value}
+                    data-suffix={suffix}
+                    data-count-decimals={decimals || undefined}
+                  >
+                    {value}
+                    {suffix}
+                  </div>
+                  <div className="mt-3 text-[14.5px] leading-snug text-brand-cream/70">
+                    {tProblem(`stats.${key}.label`)}
+                  </div>
                 </div>
-                <div className="mt-3 text-[14.5px] leading-snug text-brand-cream/70">
-                  {tProblem(`stats.${key}.label`)}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <p data-reveal className="mt-6 font-mono text-[12px] text-brand-cream/45">{tProblem('note')}</p>
         </div>
@@ -517,9 +523,9 @@ export default function LandingPage() {
             {tModel('body')}
           </p>
 
-          <div data-reveal-group className="mt-12 grid gap-4 md:grid-cols-3">
+          <div data-reveal-group className="mt-12 grid gap-4 sm:grid-cols-2">
             {tiers.map((tier, i) => {
-              const featured = i === 1;
+              const featured = i === 2;
               return (
                 <div
                   key={tier}
@@ -531,39 +537,27 @@ export default function LandingPage() {
                   }`}
                 >
                   <div
-                    className={`font-mono text-[11px] uppercase tracking-[0.12em] ${
-                      featured ? 'text-brand-terra' : 'text-brand-terra/80'
-                    }`}
-                  >
-                    {tModel(`tiers.${tier}.meta`)}
-                  </div>
-                  <div
-                    className={`mt-2 font-display text-[24px] font-bold ${
+                    className={`font-display text-[20px] font-bold ${
                       featured ? 'text-white' : 'text-brand-navy dark:text-brand-cream'
                     }`}
                   >
                     {tModel(`tiers.${tier}.name`)}
                   </div>
-                  <div
-                    className={`mt-3 font-mono text-[13px] ${featured ? 'text-brand-cream/70' : 'text-body-text-muted'}`}
-                  >
-                    {tModel(`tiers.${tier}.priceLabel`)}
+                  <div className="mt-3 flex items-baseline gap-1.5">
+                    <span className="font-display text-[30px] font-bold text-brand-terra">
+                      {tModel(`tiers.${tier}.price`)}
+                    </span>
+                    <span
+                      className={`font-mono text-[13px] ${featured ? 'text-brand-cream/60' : 'text-body-text-muted'}`}
+                    >
+                      {tModel(`tiers.${tier}.priceUnit`)}
+                    </span>
                   </div>
-                  <div className={`mt-5 h-px w-full ${featured ? 'bg-white/15' : 'bg-hairline'}`} />
-                  <ul className="mt-5 flex flex-col gap-3">
-                    {(['f1', 'f2', 'f3'] as const).map((f) => (
-                      <li key={f} className="flex items-start gap-2.5 text-[14px]">
-                        <CheckCircle2
-                          aria-hidden
-                          className={`mt-0.5 h-[18px] w-[18px] shrink-0 ${featured ? 'text-brand-terra' : 'text-risk-a'}`}
-                          strokeWidth={2.4}
-                        />
-                        <span className={featured ? 'text-brand-cream/90' : 'text-body-text'}>
-                          {tModel(`tiers.${tier}.${f}`)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div
+                    className={`mt-3 text-[14px] leading-relaxed ${featured ? 'text-brand-cream/75' : 'text-body-text-muted'}`}
+                  >
+                    {tModel(`tiers.${tier}.desc`)}
+                  </div>
                 </div>
               );
             })}
