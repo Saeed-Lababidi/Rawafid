@@ -555,8 +555,8 @@
     "notScored": "لم يُقيَّم بعد",
     "channelsCount": "{count, plural, zero {# قناة} one {# قناة} two {قناتان} few {# قنوات} many {# قناة} other {# قناة}}",
     "alertsCount": "{count, plural, zero {# تنبيه} one {# تنبيه} two {تنبيهان} few {# تنبيهات} many {# تنبيهاً} other {# تنبيه}}",
-    "expectedReturn": "العائد المتوقع للبنك",
-    "expectedReturnHint": "ربح المرابحة المُفصَح عنه والرسوم عبر محفظة التمويل لدى الإنماء. هذا عائد البنك، وليس إيراد رافد."
+    "subscriptionRevenue": "إيراد اشتراكات رافد",
+    "subscriptionRevenueHint": "إجمالي الاشتراك الشهري عبر كل التجّار، مُسعّرٌ على حجم الطلبات لا على التمويل. هذا إيراد رافد."
   },
   "sales": {
     "title": "المبيعات",

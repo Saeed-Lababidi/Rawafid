@@ -346,6 +346,7 @@ export interface PortfolioOut {
     outstanding_total: number;
     expected_revenue: number;
   };
+  subscription_revenue: number;
   open_alerts: number;
 }
 export interface AdminMerchantDetailOut {

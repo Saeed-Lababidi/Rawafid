@@ -24,6 +24,7 @@ class PortfolioOut(BaseModel):
     funnel: FunnelOut
     risk_distribution: dict[str, int]
     contracts: ContractsSummaryOut
+    subscription_revenue: float  # Rafid's monthly subscription revenue, all merchants
     open_alerts: int
 
 
