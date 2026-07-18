@@ -8,6 +8,7 @@ import { ApiError, login, roleFromToken, setTokens } from '@/lib/api';
 import { Alert, Button } from '@/components/ui/primitives';
 import { RafidMark } from '@/components/rafid-mark';
 import { FlowLines } from '@/components/flow-lines';
+import { LoginVisual } from '@/components/login-visual';
 
 const DEMO = [
   { key: 'merchantHealthy', email: 'merchant03@rafid.sa', password: 'MerchantPass123!' },
@@ -63,6 +64,9 @@ export default function LoginPage() {
           <div className="relative flex items-center gap-2.5 font-display text-[22px] font-bold">
             <RafidMark className="h-6 w-8" strokeClassName="text-brand-cream" />
             {tBrand('name')}
+          </div>
+          <div className="relative hidden flex-1 items-center justify-center py-6 lg:flex">
+            <LoginVisual className="h-auto w-full max-w-[280px]" />
           </div>
           <div className="relative mt-8">
             <p className="max-w-[26ch] font-display text-[24px] font-bold leading-tight text-white">
