@@ -47,21 +47,9 @@
     "title": "Vision 2030 wants banks financing far more small businesses. Assessing them is the blocker.",
     "body": "Saudi small and medium businesses drive the economy, yet only a fraction can access bank financing. The barrier is not appetite, it is visibility: a merchant's real sales are scattered across delivery and e-commerce aggregators, and their earnings sit locked for weeks. Banks like Alinma cannot easily see who is creditworthy, so they underwrite far fewer SMEs than the Vision 2030 target.",
     "stats": {
-      "target": {
-        "value": "20",
-        "suffix": "%",
-        "label": "Vision 2030 target for the SME share of bank financing"
-      },
-      "actual": {
-        "value": "9",
-        "suffix": "%",
-        "label": "Roughly where big banks sit today, about halfway there"
-      },
-      "locked": {
-        "value": "14",
-        "suffix": " days",
-        "label": "How long a merchant's earnings stay locked behind the aggregators"
-      }
+      "target": { "value": "20", "suffix": "%", "label": "Vision 2030 target for the SME share of bank financing" },
+      "actual": { "value": "11.3", "suffix": "%", "label": "Roughly where big banks sit today, about halfway there" },
+      "locked": { "value": "14", "suffix": " days", "label": "How long a merchant's earnings stay locked behind the aggregators" }
     },
     "note": "Figures are illustrative for the demo, pending licensed market data."
   },
@@ -112,6 +100,23 @@
         "title": "Your credit record",
         "body": "Real behaviour builds a credit history that opens the door to Alinma financing as you grow."
       }
+    }
+  },
+  "aiEngine": {
+    "eyebrow": "The Rafid engine",
+    "title": "Transparent, explainable credit scoring",
+    "body": "The engine reads months of real sales across every aggregator and your open banking data to score creditworthiness in the open, with every factor shown. A living score that improves with each transaction.",
+    "features": {
+      "sales": { "title": "Live sales data", "body": "Volume and trend across all platforms, in real time." },
+      "repayment": { "title": "Repayment behaviour", "body": "Consistency of repayment tracked with every sale." },
+      "risk": { "title": "Early risk detection", "body": "Signals surface before a repayment ever stumbles." }
+    },
+    "viz": {
+      "score": "A-",
+      "scoreLabel": "Creditworthiness score · ready to recommend",
+      "repayment": "Repayment consistency",
+      "growth": "Sales growth",
+      "stability": "Activity stability"
     }
   },
   "engine": {
@@ -193,33 +198,33 @@
   },
   "model": {
     "eyebrow": "Business model",
-    "title": "Priced on your operations, never on your money",
-    "body": "Rafid subscriptions scale with operational volume, the number of sales we process, not with any financing amount. Charging on financing volume would be bay al-dayn, so we never do it. More sales means more work on our side, and that is the only thing our tiers are built on.",
+    "title": "The revenue model, by the numbers",
+    "body": "A monthly subscription based on operational volume, not a percentage of the financing amount.",
     "note": "Sharia-compliant by design: subscription tiers track sales volume, not financing value.",
     "tiers": {
       "starter": {
         "name": "Starter",
-        "meta": "For a single shop",
-        "priceLabel": "up to 1,000 orders / month",
-        "f1": "Unified sales dashboard",
-        "f2": "Cashflow and settlement tracking",
-        "f3": "Email support"
+        "price": "199",
+        "priceUnit": "SAR/mo",
+        "desc": "Up to 500 orders · one platform"
       },
       "growth": {
         "name": "Growth",
-        "meta": "Most popular",
-        "priceLabel": "up to 10,000 orders / month",
-        "f1": "Everything in Starter",
-        "f2": "Daily cashflow advance",
-        "f3": "Explainable credit score"
+        "price": "599",
+        "priceUnit": "SAR/mo",
+        "desc": "Up to 3,000 orders · 3 platforms"
       },
-      "scale": {
-        "name": "Scale",
-        "meta": "For multi-branch SMEs",
-        "priceLabel": "unlimited orders",
-        "f1": "Everything in Growth",
-        "f2": "Priority underwriting to Alinma",
-        "f3": "Dedicated support"
+      "professional": {
+        "name": "Professional",
+        "price": "1,499",
+        "priceUnit": "SAR/mo",
+        "desc": "Up to 10,000 orders · unlimited platforms · AI priority"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "+3,000",
+        "priceUnit": "SAR/mo",
+        "desc": "On demand · direct bank integration"
       }
     }
   },

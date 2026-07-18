@@ -145,14 +145,21 @@ export function useLandingMotion(): void {
     [...solos, ...groups].forEach((el) => revealIO.observe(el));
     cleanups.push(() => revealIO.disconnect());
 
-    // Safety net: if any reveal never fired (IO hiccup, print/screenshot with no
-    // scroll), force everything visible after a grace period so content can
-    // never get stranded at opacity 0 during a live demo.
-    const safety = window.setTimeout(() => {
+    // Safety net: only rescue elements the user can actually SEE that somehow
+    // never got their reveal (an IO hiccup on in-view content). Off-screen
+    // elements are deliberately left alone - force-showing them here made every
+    // lower section flash, because the IO would then re-run opacity 0->1 the
+    // moment they scrolled into view. Scoping the rescue to the viewport keeps
+    // nothing stranded on screen while letting the scroll reveals play clean.
+    const rescueVisible = () => {
+      const vh = window.innerHeight;
       document.querySelectorAll<HTMLElement>('[data-reveal], [data-hero]').forEach((el) => {
-        if (getComputedStyle(el).opacity === '0') el.style.opacity = '1';
+        if (getComputedStyle(el).opacity !== '0') return;
+        const r = el.getBoundingClientRect();
+        if (r.top < vh && r.bottom > 0) el.style.opacity = '1';
       });
-    }, 6000);
+    };
+    const safety = window.setTimeout(rescueVisible, 3000);
     cleanups.push(() => window.clearTimeout(safety));
 
     // ---- Pause the flow-line atmosphere while it's off-screen ----
@@ -173,11 +180,19 @@ export function useLandingMotion(): void {
     }
 
     // ---- Nav scroll-spy ----
+    // A thin trigger line ~halfway down the viewport (rootMargin collapses the
+    // root to a band at 45-55%) with threshold 0: whichever section straddles
+    // that line is "current". The old threshold:0.5 could never fire on tall
+    // full-height sections - 50% of them never fit the band - so tabs stalled.
     const links = Array.from(document.querySelectorAll<HTMLElement>('[data-navlink]'));
     if (links.length) {
-      const sections = links
-        .map((l) => document.getElementById(l.getAttribute('data-navlink') ?? ''))
-        .filter((s): s is HTMLElement => !!s);
+      const sections = [
+        ...new Set(
+          links
+            .map((l) => document.getElementById(l.getAttribute('data-navlink') ?? ''))
+            .filter((s): s is HTMLElement => !!s),
+        ),
+      ];
       const spyIO = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -186,7 +201,7 @@ export function useLandingMotion(): void {
             links.forEach((l) => l.classList.toggle('is-active', l.getAttribute('data-navlink') === id));
           });
         },
-        { threshold: 0.5, rootMargin: '-20% 0px -40% 0px' },
+        { threshold: 0, rootMargin: '-45% 0px -45% 0px' },
       );
       sections.forEach((s) => spyIO.observe(s));
       cleanups.push(() => spyIO.disconnect());
