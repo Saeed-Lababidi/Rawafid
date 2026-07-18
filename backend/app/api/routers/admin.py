@@ -14,8 +14,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 @router.get("/merchants", response_model=list[AdminMerchantOut])
 async def list_merchants(_: CurrentAdmin, session: SessionDep):
-    rows = await session.execute(select(Merchant).order_by(Merchant.created_at))
-    return list(rows.scalars())
+    return await dashboard.merchants_summary(session)
 
 
 @router.get("/merchants/{merchant_id}", response_model=AdminMerchantDetailOut)

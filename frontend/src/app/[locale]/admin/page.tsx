@@ -10,6 +10,7 @@ import { Button, Card, CardHeading, Chip, StatTile } from '@/components/ui/primi
 import { IconGrowth, IconRiskShield, IconSME } from '@/components/brand-icons';
 import { QueryBoundary, Skeleton } from '@/components/ui/query-boundary';
 import { bandColor, Donut, FunnelBars } from '@/components/ui/charts';
+import { platformColor } from '@/components/app/platform-breakdown';
 import { useToast } from '@/components/providers/toast-provider';
 import {
   getAdminAlerts,
@@ -19,7 +20,7 @@ import {
 } from '@/lib/api';
 import { POLL, qk } from '@/lib/query';
 import { ADMIN_NAV } from '@/lib/nav';
-import { formatCurrency, type Locale } from '@/lib/format';
+import { formatCurrency, formatNumber, type Locale } from '@/lib/format';
 
 const BANDS = ['A', 'B', 'C', 'D'] as const;
 
@@ -112,8 +113,9 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Contract KPIs */}
-            <div className="grid gap-4 sm:grid-cols-4">
+            {/* Portfolio KPIs: contract book + the underlying trading activity
+                that feeds it (summed from the enriched merchant rows). */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <StatTile label={t('activeContracts')} value={portfolio.contracts.active} />
               <StatTile
                 label={t('disbursed')}
@@ -124,9 +126,25 @@ export default function AdminPage() {
                 value={formatCurrency(portfolio.contracts.outstanding_total, locale)}
               />
               <StatTile
-                label={t('expectedReturn')}
-                value={formatCurrency(portfolio.contracts.expected_revenue, locale)}
-                hint={t('expectedReturnHint')}
+                label={t('portfolioSales')}
+                value={formatCurrency(
+                  merchants.reduce((s, m) => s + m.sales_volume, 0),
+                  locale,
+                )}
+                hint={t('portfolioSalesHint')}
+              />
+              <StatTile
+                label={t('heldReceivables')}
+                value={formatCurrency(
+                  merchants.reduce((s, m) => s + m.held_receivables, 0),
+                  locale,
+                )}
+                hint={t('heldReceivablesHint')}
+              />
+              <StatTile
+                label={t('subscriptionRevenue')}
+                value={formatCurrency(portfolio.subscription_revenue, locale)}
+                hint={t('subscriptionRevenueHint')}
                 accent
               />
             </div>
@@ -224,18 +242,82 @@ export default function AdminPage() {
                     key={m.id}
                     href={`/admin/merchants/${m.id}`}
                     locale={locale}
-                    className="group flex items-center justify-between gap-3 py-2.5 transition-colors hover:text-accent"
+                    className="group flex flex-wrap items-center gap-x-4 gap-y-2 py-3 transition-colors"
                   >
-                    <div className="flex flex-col">
-                      <span className="text-body font-bold text-body-text group-hover:text-accent">
-                        <bdi>{m.name}</bdi>
-                      </span>
+                    {/* Name, sector · city, and the latest risk band */}
+                    <div className="flex min-w-[180px] flex-1 flex-col gap-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-body font-bold text-body-text group-hover:text-accent">
+                          <bdi>{m.name}</bdi>
+                        </span>
+                        {m.risk_band ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            <span
+                              aria-hidden
+                              className="h-2 w-2 rounded-full"
+                              style={{ backgroundColor: bandColor(m.risk_band[0]) }}
+                            />
+                            <span className="font-mono text-meta font-bold text-body-text">
+                              {t('bandLabel', { band: m.risk_band })}
+                            </span>
+                          </span>
+                        ) : null}
+                      </div>
                       <span className="text-meta text-muted-text capitalize">
                         <bdi>{m.business_type}</bdi> · <bdi>{m.city}</bdi>
+                        {m.score ? (
+                          <>
+                            {' · '}
+                            <bdi>{t('merchantScore', { score: formatNumber(m.score, locale) })}</bdi>
+                          </>
+                        ) : (
+                          <> · {t('notScored')}</>
+                        )}
                       </span>
                     </div>
+
+                    {/* Connected aggregators: a dot per channel + count */}
                     <div className="flex items-center gap-2">
-                      <Chip tone="good">{t('verified')}</Chip>
+                      <div className="flex items-center -space-x-1">
+                        {m.platforms.map((p) => (
+                          <span
+                            key={p}
+                            aria-hidden
+                            title={p}
+                            className="h-3 w-3 rounded-full ring-2 ring-card"
+                            style={{ backgroundColor: platformColor(p) }}
+                          />
+                        ))}
+                      </div>
+                      <span className="font-mono text-meta text-muted-text">
+                        {t('channelsCount', { count: m.platform_count })}
+                      </span>
+                    </div>
+
+                    {/* 90-day sales */}
+                    <div className="flex w-32 flex-col items-end">
+                      <span className="text-body font-bold text-body-text tabular-nums">
+                        <bdi>{formatCurrency(m.sales_volume, locale)}</bdi>
+                      </span>
+                      <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-text">
+                        {t('colVolume')}
+                      </span>
+                    </div>
+
+                    {/* Held receivables */}
+                    <div className="flex w-32 flex-col items-end">
+                      <span className="text-body font-bold text-body-text tabular-nums">
+                        <bdi>{formatCurrency(m.held_receivables, locale)}</bdi>
+                      </span>
+                      <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-text">
+                        {t('colHeld')}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {m.open_alerts > 0 ? (
+                        <Chip tone="warn">{t('alertsCount', { count: m.open_alerts })}</Chip>
+                      ) : null}
                       <Arrow
                         aria-hidden
                         className="h-4 w-4 text-muted-text group-hover:text-accent"

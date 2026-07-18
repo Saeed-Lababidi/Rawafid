@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, ClipboardCheck, Sparkles } from 'lucide-react';
+import { CheckCircle2, ClipboardCheck } from 'lucide-react';
 import { AppShell } from '@/components/app/app-shell';
 import { Button, Card, CardHeading, Chip, RiskChip } from '@/components/ui/primitives';
 import { FinCard } from '@/components/brand';

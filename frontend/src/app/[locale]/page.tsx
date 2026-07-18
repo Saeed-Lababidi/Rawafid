@@ -41,7 +41,7 @@ export default function LandingPage() {
   const tSol = useTranslations('solution');
   const tDiagram = useTranslations('solution.diagram');
   const tPlat = useTranslations('platform');
-  const tEng = useTranslations('aiEngine');
+  const tEng = useTranslations('engine');
   const tProduct = useTranslations('product');
   const tAlinma = useTranslations('forAlinma');
   const tModel = useTranslations('model');

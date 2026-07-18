@@ -253,7 +253,8 @@ export const getAlerts = () => api<RiskAlertOut[]>('/alerts/me');
 
 // ---- admin ----
 export const getPortfolio = () => api<PortfolioOut>('/admin/portfolio');
-export const getAdminMerchants = () => api<import('./types').MerchantOut[]>('/admin/merchants');
+export const getAdminMerchants = () =>
+  api<import('./types').AdminMerchantOut[]>('/admin/merchants');
 export const getAdminMerchant = (id: string) =>
   api<AdminMerchantDetailOut>(`/admin/merchants/${id}`);
 export const annotateOffer = (offerId: string, annotation: string) =>

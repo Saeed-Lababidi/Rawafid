@@ -10,7 +10,15 @@ from typing import Protocol
 from pydantic import BaseModel
 
 BANK_INSTITUTIONS = ["alinma", "alrajhi_synth", "riyad_synth"]
-SALES_PLATFORMS = ["salla", "zid", "jahez", "foodics"]
+
+# Sales platforms grouped by sector: a real SME sells through the aggregators of
+# its own sector, so demo merchants draw their platforms from one pool, not the
+# whole set (a retail store is not on a food-delivery app). SALES_PLATFORMS stays
+# a flat union for consent validation and any all-platform iteration.
+RETAIL_PLATFORMS = ["salla", "zid", "noon"]
+FOOD_PLATFORMS = ["jahez", "hungerstation", "mrsool", "foodics"]
+SALES_PLATFORMS = RETAIL_PLATFORMS + FOOD_PLATFORMS
+SECTOR_PLATFORMS = {"ecommerce": RETAIL_PLATFORMS, "food": FOOD_PLATFORMS}
 
 
 class ConsentSession(BaseModel):

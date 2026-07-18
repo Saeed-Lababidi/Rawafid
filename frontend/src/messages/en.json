@@ -102,14 +102,23 @@
       }
     }
   },
-  "aiEngine": {
+  "engine": {
     "eyebrow": "The Rafid engine",
     "title": "Transparent, explainable credit scoring",
     "body": "The engine reads months of real sales across every aggregator and your open banking data to score creditworthiness in the open, with every factor shown. A living score that improves with each transaction.",
     "features": {
-      "sales": { "title": "Live sales data", "body": "Volume and trend across all platforms, in real time." },
-      "repayment": { "title": "Repayment behaviour", "body": "Consistency of repayment tracked with every sale." },
-      "risk": { "title": "Early risk detection", "body": "Signals surface before a repayment ever stumbles." }
+      "sales": {
+        "title": "Live sales data",
+        "body": "Volume and trend across all platforms, in real time."
+      },
+      "repayment": {
+        "title": "Repayment behaviour",
+        "body": "Consistency of repayment tracked with every sale."
+      },
+      "risk": {
+        "title": "Early risk detection",
+        "body": "Signals surface before a repayment ever stumbles."
+      }
     },
     "viz": {
       "score": "A-",
@@ -117,9 +126,7 @@
       "repayment": "Repayment consistency",
       "growth": "Sales growth",
       "stability": "Activity stability"
-    }
-  },
-  "engine": {
+    },
     "confidenceTitle": "Decision confidence",
     "confidenceHint": "How much data stands behind this assessment — separate from the score itself.",
     "confidenceBand": {
@@ -326,7 +333,10 @@
     "platforms": {
       "salla": "Salla",
       "zid": "Zid",
+      "noon": "noon",
       "jahez": "Jahez",
+      "hungerstation": "HungerStation",
+      "mrsool": "Mrsool",
       "foodics": "Foodics"
     },
     "status": {
@@ -504,6 +514,10 @@
     "activeContracts": "Active contracts",
     "disbursed": "Total disbursed",
     "outstanding": "Total outstanding",
+    "portfolioSales": "Portfolio sales (90d)",
+    "portfolioSalesHint": "Confirmed sales across every connected merchant and aggregator.",
+    "heldReceivables": "Held receivables",
+    "heldReceivablesHint": "Confirmed earnings still locked behind the aggregators, portfolio-wide.",
     "funnelTitle": "Origination funnel",
     "funnel": {
       "registered": "Registered",
@@ -520,8 +534,17 @@
     "merchantsTitle": "Merchants",
     "verified": "Verified",
     "merchantsHint": "Open any merchant to see the full underwriting file.",
-    "expectedReturn": "Bank's expected return",
-    "expectedReturnHint": "Alinma's disclosed Murabaha profit and fees across the financing book. This is the bank's return, not Rafid's revenue."
+    "colMerchant": "Merchant",
+    "colChannels": "Channels",
+    "colVolume": "Sales (90d)",
+    "colHeld": "Held",
+    "colRisk": "Risk",
+    "merchantScore": "Score {score}",
+    "notScored": "Not scored yet",
+    "channelsCount": "{count, plural, one {# channel} other {# channels}}",
+    "alertsCount": "{count, plural, one {# alert} other {# alerts}}",
+    "subscriptionRevenue": "Rafid subscription revenue",
+    "subscriptionRevenueHint": "Total monthly subscription across all merchants, priced on order volume, never on financing. This is Rafid's revenue."
   },
   "sales": {
     "title": "Sales",
