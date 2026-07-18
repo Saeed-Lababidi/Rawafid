@@ -555,8 +555,8 @@
     "notScored": "Not scored yet",
     "channelsCount": "{count, plural, one {# channel} other {# channels}}",
     "alertsCount": "{count, plural, one {# alert} other {# alerts}}",
-    "expectedReturn": "Bank's expected return",
-    "expectedReturnHint": "Alinma's disclosed Murabaha profit and fees across the financing book. This is the bank's return, not Rafid's revenue."
+    "subscriptionRevenue": "Rafid subscription revenue",
+    "subscriptionRevenueHint": "Total monthly subscription across all merchants, priced on order volume, never on financing. This is Rafid's revenue."
   },
   "sales": {
     "title": "Sales",

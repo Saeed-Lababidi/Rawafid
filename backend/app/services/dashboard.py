@@ -21,6 +21,25 @@ from app.domain.models import (
     SettlementRow,
 )
 
+# Rafid's own revenue: a flat monthly subscription per merchant, set by their
+# operational volume (orders/month) and never by any financing amount — charging
+# on financing volume would be bay' al-dayn. Ceilings mirror the frontend tiers
+# (`model.tiers` / lib/tiers.ts); prices are the SAR/month for each tier.
+_SUBSCRIPTION_WINDOW_DAYS = 90
+_DAYS_PER_MONTH = 30
+# (inclusive max orders/month, monthly price SAR) in ascending order; above the
+# last ceiling falls through to the top (Scale) price.
+_SUBSCRIPTION_TIERS: list[tuple[float, float]] = [(1_000, 199.0), (10_000, 799.0)]
+_SCALE_PRICE = 2_499.0
+
+
+def _subscription_price(completed_orders_90d: int) -> float:
+    per_month = completed_orders_90d / _SUBSCRIPTION_WINDOW_DAYS * _DAYS_PER_MONTH
+    for max_orders, price in _SUBSCRIPTION_TIERS:
+        if per_month <= max_orders:
+            return price
+    return _SCALE_PRICE
+
 
 async def portfolio(session: AsyncSession) -> dict:
     merchants_total = await session.scalar(select(func.count()).select_from(Merchant))
@@ -87,6 +106,24 @@ async def portfolio(session: AsyncSession) -> dict:
         select(func.count()).select_from(RiskAlert).where(RiskAlert.resolved.is_(False))
     )
 
+    # Rafid subscription revenue: sum each merchant's tier price, priced purely
+    # on their completed-order volume. Merchants with no orders yet still sit on
+    # the base tier, so price every registered merchant, defaulting to 0 orders.
+    merchant_ids = (await session.execute(select(Merchant.id))).scalars().all()
+    order_counts = {
+        mid: count
+        for mid, count in (
+            await session.execute(
+                select(SalesOrderRow.merchant_id, func.count())
+                .where(SalesOrderRow.status == "completed")
+                .group_by(SalesOrderRow.merchant_id)
+            )
+        ).all()
+    }
+    subscription_revenue = round(
+        sum(_subscription_price(order_counts.get(mid, 0)) for mid in merchant_ids), 2
+    )
+
     return {
         "funnel": {
             "registered": merchants_total,
@@ -102,6 +139,7 @@ async def portfolio(session: AsyncSession) -> dict:
             "outstanding_total": round(float(outstanding_total), 2),
             "expected_revenue": round(float(expected_revenue), 2),
         },
+        "subscription_revenue": subscription_revenue,
         "open_alerts": open_alerts,
     }
 

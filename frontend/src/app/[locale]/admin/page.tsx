@@ -142,9 +142,9 @@ export default function AdminPage() {
                 hint={t('heldReceivablesHint')}
               />
               <StatTile
-                label={t('expectedReturn')}
-                value={formatCurrency(portfolio.contracts.expected_revenue, locale)}
-                hint={t('expectedReturnHint')}
+                label={t('subscriptionRevenue')}
+                value={formatCurrency(portfolio.subscription_revenue, locale)}
+                hint={t('subscriptionRevenueHint')}
                 accent
               />
             </div>
