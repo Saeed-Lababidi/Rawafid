@@ -26,6 +26,12 @@ const SECTIONS = ['problem', 'solution', 'platform', 'alinma', 'model'] as const
 const HEADLINE_H2 =
   'font-display text-[clamp(26px,3.6vw,42px)] font-bold leading-[1.1] tracking-tight text-brand-navy dark:text-brand-cream';
 
+// Soft cream background art layered over the light (cream) sections; the base
+// bg-page-bg color stays underneath, and the image is dropped in dark mode so
+// the dark surface shows through instead.
+const CREAM_BG =
+  "bg-[url('/brand/shots/cream-bg.png')] bg-cover bg-center bg-no-repeat dark:bg-none!";
+
 export default function LandingPage() {
   useLandingMotion();
 
@@ -106,7 +112,7 @@ export default function LandingPage() {
       {/* ================= HERO ================= */}
       <section
         id="top"
-        className="relative flex min-h-screen flex-col overflow-hidden bg-page-bg text-body-text"
+        className={`relative flex min-h-screen flex-col overflow-hidden bg-page-bg text-body-text ${CREAM_BG}`}
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgba(195,107,78,0.12),transparent_55%)]" />
 
@@ -320,7 +326,7 @@ export default function LandingPage() {
       </section>
 
       {/* ================= PLATFORM ================= */}
-      <section id="platform" className="scroll-mt-20 border-t border-hairline bg-page-bg py-20 lg:py-28">
+      <section id="platform" className={`scroll-mt-20 border-t border-hairline bg-page-bg py-20 lg:py-28 ${CREAM_BG}`}>
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <div data-reveal>
             <Eyebrow className="text-brand-terra">{tPlat('eyebrow')}</Eyebrow>
@@ -413,7 +419,7 @@ export default function LandingPage() {
       </section>
 
       {/* ================= PRODUCT - one platform, four views ================= */}
-      <section className="scroll-mt-20 border-t border-hairline bg-page-bg py-20 lg:py-28">
+      <section className={`scroll-mt-20 border-t border-hairline bg-page-bg py-20 lg:py-28 ${CREAM_BG}`}>
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <div data-reveal>
             <Eyebrow className="text-brand-terra">{tProduct('eyebrow')}</Eyebrow>
